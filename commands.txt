@@ -30,3 +30,5 @@ PACKAGES :
     npm install --save-dev @types/passport-local
     npm install @prisma/client
     npm install uuidv4
+    npm i @nestjs/jwt
+    npm i -D @types/nestjs/jwt
