@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Manager {
+  id_manager    String   @id @default(uuid())
+  username      String   @unique
+  password      String   @db.VarChar(200)
+  password_salt String
+  firstname     String
+  lastname      String
+  email         String   @unique
+  phone         String?  @unique
+  address       String?  @unique
+  admin         Boolean
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sales SaleTransaction[] @relation("manager_sales")
+  recoveries RecoverTransaction[] @relation("manager_recoveries")
+  deposits DepositTransaction[] @relation("manager_deposits")
+}
+
+model Seller {
+  id_seller     String   @id @default(uuid())
+  username      String?  @unique
+  password      String?
+  password_salt String?
+  firstname     String
+  lastname      String
+  email         String   @unique
+  phone         String?  @unique
+  address       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  games DepositedGame[] @relation("seller_games")
+  sales SaleTransaction[] @relation("seller_sales")
+  recoveries RecoverTransaction[] @relation("seller_recoveries")
+  deposits DepositTransaction[] @relation("seller_deposits")
+}
+
+model Client {
+  id_client Int     @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String
+  phone     String
+  address   String?
+  purchases SaleTransaction[] @relation("client_purchases")
+}
+
+model GameCategory {
+  id_category Int    @id @default(autoincrement())
+  name        String
+  description String
+  games       Game[] @relation("category_games")
+}
+
+model GameEditor {
+  id_editor   Int     @id @default(autoincrement())
+  name        String
+  description String?
+  games       Game[]  @relation("editor_games")
+}
+
+model Game {
+  id_game     Int          @id @default(autoincrement())
+  name        String
+  description String
+  min_players Int
+  max_players Int
+  min_age     Int
+  max_age     Int
+  id_editor   Int
+  id_category Int
+  editor      GameEditor   @relation("editor_games", fields: [id_editor], references: [id_editor], onUpdate: Cascade, onDelete: Cascade)
+  category    GameCategory @relation("category_games", fields: [id_category], references: [id_category], onUpdate: Cascade, onDelete: Cascade)
+  copies DepositedGame[] @relation("game_copies")
+  game_sold GameInSaleTransaction[] @relation("game_sold")
+  game_recovered GameInRecoverTransaction[] @relation("game_recovered")
+  game_deposited GameInDepositTransaction[] @relation("game_deposited")
+}
+
+model Session {
+  id_session     Int      @id @default(autoincrement())
+  date_begin     DateTime
+  date_end       DateTime
+  deposit_fees   Decimal
+  discount       Decimal
+  comission_fees Decimal
+  games DepositedGame[] @relation("session_games")
+}
+
+model DepositedGame {
+  tag        String  @id @default(uuid())
+  price      Decimal
+  sold       Boolean
+  for_sale   Boolean
+  id_session Int
+  id_seller String
+  id_game Int
+  session Session @relation("session_games", fields: [id_session], references: [id_session], onUpdate: Cascade, onDelete: Cascade)
+  game Game @relation("game_copies", fields: [id_game], references: [id_game], onUpdate: Cascade, onDelete: Cascade)
+  seller Seller @relation("seller_games", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  CASH
+  CHECK
+}
+
+model SaleTransaction {
+  id_sale String @id @default(uuid())
+  date DateTime @default(now())
+  amount Decimal
+  comission Decimal
+  payment_method PaymentMethod
+  id_seller String
+  id_client Int
+  id_manager String
+  seller Seller @relation("seller_sales", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
+  client Client @relation("client_purchases", fields: [id_client], references: [id_client], onUpdate: Cascade, onDelete: Cascade)
+  manager Manager @relation("manager_sales", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  game_in_sale GameInSaleTransaction[] @relation("game_in_sale")
+}
+
+model RecoverTransaction {
+  id_recover String @id @default(uuid())
+  date DateTime @default(now())
+  amount Decimal
+  id_seller String
+  id_manager String
+  seller Seller @relation("seller_recoveries", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
+  manager Manager @relation("manager_recoveries", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  game_in_recover GameInRecoverTransaction[] @relation("game_in_recover")
+}
+
+model DepositTransaction {
+  id_deposit String @id @default(uuid())
+  date DateTime @default(now())
+  fees Decimal
+  discount Decimal
+  id_seller String
+  id_manager String
+  seller Seller @relation("seller_deposits", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
+  manager Manager @relation("manager_deposits", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  game_in_deposit GameInDepositTransaction[] @relation("game_in_deposit")
+}
+
+model GameInSaleTransaction {
+  id_sale String
+  id_game Int
+  tags String[]
+  quantity Int
+
+  sale SaleTransaction @relation("game_in_sale", fields: [id_sale], references: [id_sale], onUpdate: Cascade, onDelete: Cascade)
+  game Game @relation("game_sold", fields: [id_game], references: [id_game], onUpdate: Cascade, onDelete: Cascade)
+
+  @@id([id_sale, id_game])
+}
+
+model GameInRecoverTransaction {
+  id_recover String
+  id_game Int
+  tags String[]
+  quantity Int
+
+  recover RecoverTransaction @relation("game_in_recover", fields: [id_recover], references: [id_recover], onUpdate: Cascade, onDelete: Cascade)
+  game Game @relation("game_recovered", fields: [id_game], references: [id_game], onUpdate: Cascade, onDelete: Cascade)
+
+  @@id([id_game, id_recover])
+}
+
+model GameInDepositTransaction {
+  id_deposit String
+  id_game Int
+  tags String[]
+  quantity Int
+
+  @@id([id_deposit, id_game])
+
+  deposit DepositTransaction @relation("game_in_deposit", fields: [id_deposit], references: [id_deposit], onUpdate: Cascade, onDelete: Cascade)
+  game Game @relation("game_deposited", fields: [id_game], references: [id_game], onUpdate: Cascade, onDelete: Cascade)
+}

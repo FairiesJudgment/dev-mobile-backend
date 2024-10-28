@@ -1,0 +1,32 @@
+PRISMA : 
+
+    initialization : 
+        npx prisma init
+
+    see db :
+        npx prisma studio
+
+    after restarting docker :
+        npx prisma generate
+        npx prisma migrate dev --name initial
+        node seed.js
+
+    to access database infos :
+        docker compose down (to shut down in case)
+        docker compose up -d 
+        docker exec -it <db_ID> psql -U <user>
+        \c <DB_name>
+        SELECT * FROM "TABLE";
+        exit
+
+
+PACKAGES : 
+
+    npm i --save class-validator class-transformer
+    npm i --save @nestjs/config
+    npm i bcrypt 
+    npm i -D @types/bcrypt
+    npm install --save @nestjs/passport passport passport-local
+    npm install --save-dev @types/passport-local
+    npm install @prisma/client
+    npm install uuidv4
