@@ -19,9 +19,4 @@ export class AuthController {
     async logout(@Request() req) {
         return req.logout();
     }
-
-    @Get('hello')
-    hello() {
-        return "hello";
-    }
 }
