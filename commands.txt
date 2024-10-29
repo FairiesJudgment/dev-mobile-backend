@@ -32,3 +32,5 @@ PACKAGES :
     npm install uuidv4
     npm i @nestjs/jwt
     npm i -D @types/nestjs/jwt
+    npm install --save @nestjs/jwt passport-jwt
+    npm install --save-dev @types/passport-jwt

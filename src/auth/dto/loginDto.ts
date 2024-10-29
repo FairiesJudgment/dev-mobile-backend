@@ -1,7 +1,8 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from "class-validator";
+import { CustomIsEmail } from "src/common/decorators/CustomIsEmail";
 
 export class LoginDto {
-    @IsEmail()
+    @CustomIsEmail()
     readonly email : string
     @IsNotEmpty()
     readonly password : string

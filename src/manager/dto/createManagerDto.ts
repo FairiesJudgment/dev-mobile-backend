@@ -1,10 +1,11 @@
-import { IsEmail, IsNotEmpty, IsOptional } from "class-validator";
-import { IsPhoneNumber } from "src/common/decorators/IsPhoneNumber";
+import { IsNotEmpty, IsOptional } from "class-validator";
+import { CustomIsEmail } from "src/common/decorators/CustomIsEmail";
+import { CustomIsPhoneNumber } from "src/common/decorators/CustomIsPhoneNumber";
 
 export class CreateManagerDto {
     @IsNotEmpty()
     readonly username : string;
-    @IsEmail()
+    @CustomIsEmail()
     readonly email : string;
     @IsNotEmpty()
     readonly password : string;
@@ -12,7 +13,7 @@ export class CreateManagerDto {
     readonly firstname : string;
     @IsNotEmpty()
     readonly lastname : string;
-    @IsPhoneNumber()
+    @CustomIsPhoneNumber()
     readonly phone : string;
     @IsOptional()
     readonly address : string;

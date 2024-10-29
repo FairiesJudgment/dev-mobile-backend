@@ -13,7 +13,7 @@ class IsPhoneNumberConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export function IsPhoneNumber(validationOptions?: ValidationOptions) {
+export function CustomIsPhoneNumber(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
