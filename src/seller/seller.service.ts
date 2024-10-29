@@ -6,11 +6,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class SellerService {
     constructor(private readonly prismaService : PrismaService) {}
 
-    async findSeller(email : string) {
+    async findSeller(options: { email?: string, id_seller?: string, username?: string}) {
+        const { email, id_seller, username } = options;
         const seller = this.prismaService.seller.findUnique({
-            where : {
-                email,
-            }
+            where : email ? { email } : id_seller ? { id_seller } : { username }
         });
         return seller;
     }

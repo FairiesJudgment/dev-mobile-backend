@@ -26,14 +26,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: Payload) {
     // verifier si le token appartient à un manager
-    const manager = await this.managerService.findManager(payload.email);
+    const manager = await this.managerService.findManager({email : payload.email});
     // si on a trouvé un manager correpondant
     if (manager) {
         Reflect.deleteProperty(manager, "password");
         return manager;
     }
     // pas de manager correspondant, on cherche un seller
-    const seller = await this.sellerService.findSeller(payload.email);
+    const seller = await this.sellerService.findSeller({email : payload.email});
     // aucun seller ni manager
     if (!seller) throw new UnauthorizedException("Non authorisé !");
     // on a trouvé un seller

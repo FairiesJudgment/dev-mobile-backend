@@ -2,9 +2,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { LoginDto } from './dto/loginDto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ManagerService } from 'src/manager/manager.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SellerService } from 'src/seller/seller.service';
@@ -12,7 +10,6 @@ import { SellerService } from 'src/seller/seller.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prismaService: PrismaService,
     private readonly managerService: ManagerService,
     private readonly sellerService : SellerService,
     private readonly jwtService : JwtService,
@@ -22,12 +19,12 @@ export class AuthService {
   async validateUser(loginDto : LoginDto) {
     const {email, password} = loginDto;
 
-    const manager = await this.managerService.findManager(email);
+    const manager = await this.managerService.findManager({ email : email });
     if (manager && await this.managerService.validatePassword(password, manager.password_salt, manager.password)) {
       return manager;
     }
 
-    const seller = await this.sellerService.findSeller(email);
+    const seller = await this.sellerService.findSeller({ email : email });
     if (seller && await this.sellerService.validatePassword(password, seller.password_salt, seller.password)) {
       return seller;
     }
@@ -42,7 +39,7 @@ export class AuthService {
       payload = {
         sub : user.id_manager,
         username : user.username,
-        isAdmin : user.is_admin,
+        email : user.email,
       }
     }
     // si l'utilisateur est un seller

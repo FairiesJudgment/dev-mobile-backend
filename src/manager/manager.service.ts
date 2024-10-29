@@ -8,23 +8,56 @@ import { CreateManagerDto } from './dto/createManagerDto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { uuid } from 'uuidv4';
+import { UpdateManagerDto } from './dto/updateManagerDto';
 
 @Injectable()
 export class ManagerService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  // trouver un manager selon son email
-  async findManager(email: string) {
+  // trouver un manager selon son email, son id ou son pseudo
+  async findManager(options: {
+    email?: string;
+    id_manager?: string;
+    username?: string;
+  }) {
+    const { email, id_manager, username } = options;
+
+    if (!email && !id_manager && !username) {
+      throw new Error(
+        'Vous devez fournir au moins un élément parmi un email, un id ou un pseudo.',
+      );
+    }
+
     const manager = await this.prismaService.manager.findUnique({
-      where: {
-        email,
-      },
+      where: email ? { email } : id_manager ? { id_manager } : { username },
     });
+
     return manager;
   }
 
-  async validatePassword(password : string, password_salt : string, hash : string) {
+  async validatePassword(
+    password: string,
+    password_salt: string,
+    hash: string,
+  ) {
     return await bcrypt.compare(password + password_salt, hash);
+  }
+
+  async getAll() {
+    return await this.prismaService.manager.findMany();
+  }
+
+  async get(username: string) {
+    const manager = await this.findManager({ username: username });
+    if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    return {
+      manager: {
+        username: manager.username,
+        firstname: manager.firstname,
+        lastname: manager.lastname,
+        email: manager.email,
+      },
+    };
   }
 
   // enregistrer un manager en BD
@@ -37,12 +70,12 @@ export class ManagerService {
       lastname,
       phone,
       address,
-      isAdmin,
+      is_admin,
     } = createManagerDto;
 
     //verifier si manager existe déjà
-    const manager = this.findManager(email);
-    if (manager) throw new ConflictException('Ce manager existe déjà !');
+    const manager = this.findManager({ email: email });
+    if (manager) throw new ConflictException('Ce manager existe déjà.');
 
     //hasher mot de passe
     const salt = uuid();
@@ -59,11 +92,51 @@ export class ManagerService {
         lastname,
         phone,
         address,
-        is_admin: isAdmin,
+        is_admin,
       },
     });
 
     // retourner réponse de succès
-    return { data: 'Manager créé avec succès' };
+    return { data: 'Manager créé avec succès !' };
+  }
+
+  async delete(id_manager: string) {
+    // verifier que le manager existe
+    const manager = await this.findManager({ id_manager: id_manager });
+    if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    await this.prismaService.manager.delete({
+      where: {
+        id_manager,
+      },
+    });
+    return { data: 'Manager supprimé !' };
+  }
+
+  async update(
+    id_manager: string,
+    updateManagerDto: UpdateManagerDto,
+    asker_id: any,
+  ) {
+    // verifier que le manager existe
+    const manager = await this.findManager({ id_manager: id_manager });
+    if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    // si demandeur pas propriétaire du compte
+    if (asker_id !== id_manager) {
+      //récupérer infos demandeur
+      const asker = await this.findManager({ id_manager: asker_id });
+      // si demandeur n'est pas admin
+      if (!asker.is_admin)
+        throw new UnauthorizedException('Opération interdite');
+    }
+    // appliquer modifications
+    await this.prismaService.manager.update({
+      where: {
+        id_manager,
+      },
+      data: {
+        ...updateManagerDto,
+      },
+    });
+    return { data: 'Manager mis à jour !' };
   }
 }
