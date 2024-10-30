@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { ManagerService } from 'src/manager/manager.service';
 
 @Injectable()
-export class AdminGuard implements CanActivate {
+export class ManagerGuard implements CanActivate {
   constructor(
     private readonly managerService : ManagerService,
     private readonly jwtService: JwtService,
@@ -30,7 +30,7 @@ export class AdminGuard implements CanActivate {
 
       const manager = await this.managerService.findManager({ id_manager : payload.sub})
 
-      if (manager.is_admin === true) {
+      if (manager) {
         return true;
       } else {
         throw new UnauthorizedException('Accès refusé');
