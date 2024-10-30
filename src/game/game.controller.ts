@@ -1,14 +1,17 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { AdminGuard } from 'src/common/guards/admin.guard';
 import { CreateGameDto } from './dto/createGameDto';
 import { Public } from 'src/common/decorators/PublicDecorator';
+import { ManagerGuard } from 'src/common/guards/manager.guard';
+import { UpdateGameDto } from './dto/updateGameDto';
 
 @Controller('game')
 export class GameController {
 
     constructor(private readonly gameService: GameService) {}
 
+    @Public()
     @Get()
     getAll() {
         return this.gameService.getAll();
@@ -20,9 +23,21 @@ export class GameController {
         return this.gameService.get(id_game);
     }
 
-    @UseGuards(AdminGuard)
+    @UseGuards(ManagerGuard)
     @Post()
     create(@Body() createGameDto: CreateGameDto) {
         return this.gameService.create(createGameDto);
+    }
+
+    @UseGuards(ManagerGuard)
+    @Put(':id_game')
+    update(@Param('id_game') id_game: number, @Body() updateGameDto: UpdateGameDto) {
+        return this.gameService.update(id_game, updateGameDto);
+    }
+
+    @UseGuards(ManagerGuard)
+    @Delete(':id_game')
+    delete(@Param('id_game') id_game: number) {
+        return this.gameService.delete(id_game);
     }
 }
