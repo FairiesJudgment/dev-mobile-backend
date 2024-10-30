@@ -16,21 +16,10 @@ export class GameService {
     // récupérer un jeu selon son id
     async get(id_game: number) {
         // Vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game: Number(id_game) },});
+        const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
         // Retourner les infos du jeu
-        return { 
-            game: {
-                name: game.name,
-                description: game.description,
-                min_players: game.min_players,
-                max_players: game.max_players,
-                min_age: game.min_age,
-                max_age: game.max_age,
-                id_editor: game.id_editor,
-                id_category: game.id_category
-            }
-        };
+        return game;
     }
 
     // créer un jeu
