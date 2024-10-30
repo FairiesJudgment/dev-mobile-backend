@@ -5,8 +5,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ManagerModule } from './manager/manager.module';
 import { SellerModule } from './seller/seller.module';
 import { GameModule } from './game/game.module';
+import { GameCategoryModule } from './game-category/game-category.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, GameModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, GameModule, GameCategoryModule],
 })
 export class AppModule {}
