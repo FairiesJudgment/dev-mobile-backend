@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSellerDto } from './dto/createSellerDto';
@@ -85,6 +85,36 @@ export class SellerService {
   }
 
   async update (id_seller: string, updateSellerDto: UpdateSellerDto, asker_id: any) {
-            
+        // verifier que seller existe
+        const seller = await this.findSeller({id_seller : id_seller});
+        if (!seller) throw new NotFoundException("Ce vendeur n'exsite pas.");
+        // si demandeur pas propriétaire du compte
+        if (asker_id !== id_seller) {
+            // verifier que c'est un manager
+            const asker = await this.managerService.findManager({id_manager : asker_id});
+            if (!asker) throw new UnauthorizedException("Opération interdite");
+        }
+        // appliquer modifications
+        await this.prismaService.seller.update({
+            where : {
+                id_seller,
+            },
+            data : {
+                ...updateSellerDto,
+            },
+        });
+        return { data : 'Vendeur mis à jour !' };
+    }
+
+    async delete(id_seller: string) {
+        // vérifier que le seller existe
+        const seller = await this.findSeller({id_seller : id_seller});
+        if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
+        await this.prismaService.seller.delete({
+            where : {
+                id_seller,
+            },
+        });
+        return { data : 'Vendeur supprimé !' };
     }
 }

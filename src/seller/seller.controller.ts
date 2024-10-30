@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Get, Param, Req, Put } from '@nestjs/common';
+import { Controller, Post, UseGuards, Get, Param, Req, Put, Delete } from '@nestjs/common';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { CreateSellerDto } from './dto/createSellerDto';
 import { SellerService } from './seller.service';
@@ -34,6 +34,12 @@ export class SellerController {
     update(@Param('id') id_seller : string, updateSellerDto : UpdateSellerDto, @Req() request : Request) {
         const asker_id = request.user['id_manager'] ? request.user['id_manager'] : request.user['id_seller'];
         return this.sellerService.update(id_seller, updateSellerDto, asker_id);
+    }
+
+    @UseGuards(ManagerGuard)
+    @Delete('/delete:id')
+    delete(@Param('id') id_seller : string) {
+        return this.sellerService.delete(id_seller);
     }
 
 
