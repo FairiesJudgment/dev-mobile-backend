@@ -57,3 +57,12 @@ Requests body :
         "phone" : "0712345678",
         "address" : "5 rue de BDR"
         }
+
+    CRUD Session : 
+        {
+            "date_begin" : ,
+            "date_end" : ,
+            "deposit_fees" : ,
+            "discount" : ,
+            "comission_fees" :
+        }
