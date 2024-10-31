@@ -53,8 +53,8 @@ model Client {
   id_client Int     @id @default(autoincrement())
   firstname String
   lastname  String
-  email     String
-  phone     String
+  email     String @unique
+  phone     String @unique
   address   String?
   purchases SaleTransaction[] @relation("client_purchases")
 }

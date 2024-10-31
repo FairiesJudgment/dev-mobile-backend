@@ -7,8 +7,10 @@ import { SellerModule } from './seller/seller.module';
 import { GameModule } from './game/game.module';
 import { GameCategoryModule } from './game-category/game-category.module';
 import { GameEditorModule } from './game-editor/game-editor.module';
+import { ClientModule
 
+ } from './client/client.module';
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, GameModule, GameCategoryModule, GameEditorModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, ClientModule, GameModule, GameCategoryModule, GameEditorModule],
 })
 export class AppModule {}
