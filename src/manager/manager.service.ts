@@ -80,9 +80,13 @@ export class ManagerService {
       is_admin,
     } = createManagerDto;
 
-    //verifier si manager existe déjà
-    const manager = await this.findManager({ email: email });
-    if (manager) throw new ConflictException('Ce manager existe déjà.');
+    // verifier si l'email n'est pas déjà utilisé
+    if (email) {
+      const manager = await this.findManager({ email: email });
+      if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
+      const seller = await this.prismaService.seller.findUnique({where: { email: email },});
+      if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+    }
 
     //hasher mot de passe
     const salt = uuid();
@@ -134,6 +138,13 @@ export class ManagerService {
       // si demandeur n'est pas admin
       if (!asker.is_admin)
         throw new UnauthorizedException('Opération interdite');
+    }
+    // verifier si l'email n'est pas déjà utilisé
+    if (updateManagerDto.email) {
+      const manager = await this.findManager({ email: updateManagerDto.email });
+      if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
+      const seller = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email },});
+      if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
     }
     // appliquer modifications
     await this.prismaService.manager.update({

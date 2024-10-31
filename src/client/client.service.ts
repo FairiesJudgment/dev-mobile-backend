@@ -40,14 +40,28 @@ export class ClientService {
     }
 
     async create(createClientDto: CreateClientDto) {
-        //verifier si client existe déjà
+        const {
+            firstname,
+            lastname,
+            email,
+            phone,
+            address
+        } = createClientDto;
+        //verifier si l'email existe déjà
         const client = await this.findClient({ email: createClientDto.email });
-        if (client) throw new ConflictException("Ce client existe déjà.")
+        if (client) throw new ConflictException("Cet email est déjà utilisé.");
+        // Verifier si le numéro de téléphone existe déjà
+        const clientPhone = await this.findClient({ phone: createClientDto.phone });
+        if (clientPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé.")
 
         // créer client
         await this.prismaService.client.create({
         data: {
-            ...createClientDto,
+            firstname,
+            lastname,
+            email,
+            phone,
+            address,
         },
         });
 
@@ -55,9 +69,16 @@ export class ClientService {
     }
 
     async update(id_client: number, updateClientDto: UpdateClientDto) {
-        // verifier que le client existe
-        const client = await this.findClient({ id_client : id_client });
-        if (!client) throw new NotFoundException("Ce client n'existe pas.");
+        // Verifier si l'email existe déjà
+        if (updateClientDto.email) {
+            const client = await this.findClient({ email: updateClientDto.email });
+            if (client) throw new ConflictException("Cet email est déjà utilisé.");
+        }
+        // Verifier si le numéro de téléphone existe déjà
+        if (updateClientDto.phone) {
+            const clientPhone = await this.findClient({ phone: updateClientDto.phone });
+            if (clientPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé.");
+        }
 
         // mettre à jour le client
         await this.prismaService.client.update({
