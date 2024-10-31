@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -22,6 +22,10 @@ export class GameEditorService {
     // créer un éditeur de jeu
     async create(createGameEditorDto: any) {
         const { name, description } = createGameEditorDto;
+
+        // vérifier si l'éditeur existe déjà
+        const gameEditor = await this.prismaService.gameEditor.findUnique({where: { name },});
+        if (gameEditor) { throw new ConflictException("Cet éditeur de jeu existe déjà.");}
 
         // enregistrer l'éditeur en BD
         await this.prismaService.gameEditor.create({

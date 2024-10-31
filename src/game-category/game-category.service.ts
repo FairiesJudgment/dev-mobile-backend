@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGameCategoryDto } from './dto/createGameCategoryDto';
 import { UpdateGameCategoryDto } from './dto/updateGameCategoryDto';
@@ -25,6 +25,10 @@ export class GameCategoryService {
     // créer une catégorie de jeu
     async create(createGameCategoryDto: CreateGameCategoryDto) {
         const { name, description } = createGameCategoryDto;
+
+        // vérifier si la catégorie existe déjà
+        const gameCategory = await this.prismaService.gameCategory.findUnique({where: { name },});
+        if (gameCategory) { throw new ConflictException("Cette catégorie de jeu existe déjà.");}
 
         // enregistrer la catégorie en BD
         await this.prismaService.gameCategory.create({

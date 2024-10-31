@@ -61,21 +61,21 @@ model Client {
 
 model GameCategory {
   id_category Int    @id @default(autoincrement())
-  name        String
+  name        String  @unique
   description String
   games       Game[] @relation("category_games")
 }
 
 model GameEditor {
   id_editor   Int     @id @default(autoincrement())
-  name        String
+  name        String  @unique
   description String?
   games       Game[]  @relation("editor_games")
 }
 
 model Game {
   id_game     Int          @id @default(autoincrement())
-  name        String
+  name        String     @unique
   description String
   min_players Int
   max_players Int

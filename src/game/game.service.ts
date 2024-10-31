@@ -24,6 +24,7 @@ export class GameService {
 
     // créer un jeu
     async create(createGameDto: CreateGameDto) {
+
         const {
             name,
             description,
@@ -35,9 +36,17 @@ export class GameService {
             id_category 
         } = createGameDto;
 
+        // Vérifier si l'éditeur existe
+        const editor = await this.prismaService.gameEditor.findUnique({where: { id_editor },});
+        if (!editor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
+
+        // Vérifier si la catégorie existe
+        const category = await this.prismaService.gameCategory.findUnique({where: { id_category },});
+        if (!category) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
+
         // vérifier si le jeu existe déjà
-        // const game = await this.prismaService.game.findGame({where: { name: name }});
-        // if (game) { throw new ConflictException("Ce jeu existe déjà.");}
+        const game = await this.prismaService.game.findUnique({where: { name },});
+        if (game) { throw new ConflictException("Ce jeu existe déjà.");}
         
         // enregistrer le jeu en BD
         await this.prismaService.game.create({
@@ -48,8 +57,8 @@ export class GameService {
                 max_players,
                 min_age,
                 max_age,
-                id_editor : Number(id_editor),
-                id_category : Number(id_category)
+                id_editor : id_editor,
+                id_category : id_category
             }
         });
         // retourner message de succès
@@ -74,8 +83,7 @@ export class GameService {
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
         // modifier le jeu en BD
-        await this.prismaService.game.update({
-            where: { id_game: id_game },
+        await this.prismaService.game.update({ where: { id_game: Number(id_game) },
             data: {
                 name,
                 description,
@@ -83,8 +91,8 @@ export class GameService {
                 max_players,
                 min_age,
                 max_age,
-                id_editor : Number(id_editor),
-                id_category : Number(id_category)
+                id_editor : id_editor,
+                id_category : id_category
             }
         });
         // retourner message de succès
@@ -98,7 +106,7 @@ export class GameService {
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
         // supprimer le jeu en BD
-        await this.prismaService.game.delete({where: { id_game: id_game }});
+        await this.prismaService.game.delete({where: { id_game: Number(id_game) },});
         // retourner message de succès
         return { data: 'Jeu supprimé !' };
     }

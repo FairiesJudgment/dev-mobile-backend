@@ -27,10 +27,10 @@ export class CreateGameDto {
     max_age: number;
     
     @IsNotEmpty()
-    @IsString()
-    id_editor: string;
+    @IsInt()
+    id_editor: number;
     
     @IsNotEmpty()
-    @IsString()
-    id_category: string;
+    @IsInt()
+    id_category: number;
 }
