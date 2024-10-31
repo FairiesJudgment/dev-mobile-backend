@@ -51,8 +51,11 @@ export class ManagerService {
     // vérifier si le manager existe
     const manager = await this.findManager({ username: username });
     if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
-    // si la demande vient d'un manager
-    if (await this.findManager({id_manager : asker_id})) return manager;
+    // si la demande vient d'un utilisateur connecté
+    if (asker_id) {
+      //si la demande vient d'un manager retourne toutes les infos
+      if (await this.findManager({id_manager : asker_id})) return manager;
+    }
     // sinon infos publiques seulement
     return {
       manager: {
@@ -119,7 +122,7 @@ export class ManagerService {
   async update(
     id_manager: string,
     updateManagerDto: UpdateManagerDto,
-    asker_id: any,
+    asker_id: string,
   ) {
     // verifier que le manager existe
     const manager = await this.findManager({ id_manager: id_manager });

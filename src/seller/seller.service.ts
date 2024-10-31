@@ -36,12 +36,14 @@ export class SellerService {
         return await this.prismaService.seller.findMany();
     }
 
-    async get(username: string, asker_id: any) {
+    async get(username: string, asker_id: string) {
         const seller = await this.findSeller({username : username});
         if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
         // si la demande vient d'un manager return toutes les infos
-        if (await this.managerService.findManager({id_manager : asker_id})) {
-            return seller;
+        if (asker_id) {
+            if (await this.managerService.findManager({id_manager : asker_id})) {
+                return seller;
+            }
         }
         // sinon infos publiques seulement
         return {

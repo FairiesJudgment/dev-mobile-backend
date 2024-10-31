@@ -1,14 +1,19 @@
-import { Controller, Post, UseGuards, Get, Param, Req, Put, Delete } from '@nestjs/common';
+import { Controller, Post, UseGuards, Get, Param, Req, Put, Delete, Body } from '@nestjs/common';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { CreateSellerDto } from './dto/createSellerDto';
 import { SellerService } from './seller.service';
 import { Public } from 'src/common/decorators/PublicDecorator';
 import { Request } from 'express';
 import { UpdateSellerDto } from './dto/updateSellerDto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('sellers')
 export class SellerController {
-    constructor(private readonly sellerService : SellerService) {}
+    constructor(private readonly sellerService : SellerService,
+        private readonly jwtService : JwtService,
+        private readonly configService : ConfigService,
+    ) {}
 
     @UseGuards(ManagerGuard)
     @Get()
@@ -19,25 +24,31 @@ export class SellerController {
     @Public()
     @Get('/:username')
     get(@Param('username') username : string, @Req() request : Request) {
-        const asker_id = request.user['id_manager'];
-        console.log(`asker id : ${asker_id}`);
+        const authHeaders = request.headers.authorization;
+        let payload = {};
+        let asker_id = "";
+        if (authHeaders) {
+            const token = request.headers.authorization.split(' ')[1];
+            payload = this.jwtService.verify(token, {secret : this.configService.get('TOKEN_SECRET')});
+            asker_id = payload['sub'];
+        }
         return this.sellerService.get(username, asker_id);
     }
 
     @UseGuards(ManagerGuard)
     @Post()
-    create(createSellerDto : CreateSellerDto) {
-        this.sellerService.create(createSellerDto);
+    create(@Body() createSellerDto : CreateSellerDto) {
+        return this.sellerService.create(createSellerDto);
     }
 
-    @Put('/update:id')
-    update(@Param('id') id_seller : string, updateSellerDto : UpdateSellerDto, @Req() request : Request) {
+    @Put('/update/:id')
+    update(@Param('id') id_seller : string, @Body() updateSellerDto : UpdateSellerDto, @Req() request : Request) {
         const asker_id = request.user['id_manager'] ? request.user['id_manager'] : request.user['id_seller'];
         return this.sellerService.update(id_seller, updateSellerDto, asker_id);
     }
 
     @UseGuards(ManagerGuard)
-    @Delete('/delete:id')
+    @Delete('/delete/:id')
     delete(@Param('id') id_seller : string) {
         return this.sellerService.delete(id_seller);
     }
