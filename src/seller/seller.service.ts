@@ -61,9 +61,13 @@ export class SellerService {
     const { username, email, password, firstname, lastname, phone, address } =
       createSellerDto;
 
-    // verifier si seller existe déjà
-    const seller = await this.findSeller({ email: email });
-    if (seller) throw new ConflictException('Ce vendeur existe déjà.');
+    // verifier si l'email n'est pas déjà utilisé
+    if (email) {
+        const seller = await this.findSeller({ email: email });
+        if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+        const manager = await this.managerService.findManager({ email: email });
+        if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
+      }
 
     //hasher mdp
     const salt = uuid();
@@ -95,6 +99,13 @@ export class SellerService {
             // verifier que c'est un manager
             const asker = await this.managerService.findManager({id_manager : asker_id});
             if (!asker) throw new UnauthorizedException("Opération interdite");
+        }
+        // verifier que l'email n'est pas déjà utilisé
+        if (updateSellerDto.email) {
+            const seller = await this.findSeller({email : updateSellerDto.email});
+            if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+            const manager = await this.managerService.findManager({email : updateSellerDto.email});
+            if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
         }
         // appliquer modifications
         await this.prismaService.seller.update({
