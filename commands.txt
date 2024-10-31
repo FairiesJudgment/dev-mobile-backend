@@ -48,3 +48,12 @@ Requests body :
         "phone" : "0712345678",
         "address" : "5 rue de BDR"
         }
+
+    CRUD Client : 
+        {
+        "email" : "shane.donnelly@etu.umontpellier.fr",
+        "firstname" : "Shane",
+        "lastname" : "Donnelly",
+        "phone" : "0712345678",
+        "address" : "5 rue de BDR"
+        }
