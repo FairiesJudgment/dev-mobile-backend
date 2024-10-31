@@ -1,9 +1,10 @@
 import { IsNotEmpty, IsOptional } from "class-validator";
 import { CustomIsEmail } from "src/common/decorators/CustomIsEmail";
 import { CustomIsPhoneNumber } from "src/common/decorators/CustomIsPhoneNumber";
+import { IsUsername } from "src/common/decorators/IsUsername";
 
 export class CreateManagerDto {
-    @IsNotEmpty()
+    @IsUsername()
     readonly username : string;
     @CustomIsEmail()
     readonly email : string;

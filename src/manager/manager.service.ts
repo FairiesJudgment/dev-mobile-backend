@@ -47,9 +47,16 @@ export class ManagerService {
     return await this.prismaService.manager.findMany();
   }
 
-  async get(username: string) {
+  async get(username: string, asker_id: any) {
+    // vérifier si le manager existe
     const manager = await this.findManager({ username: username });
     if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    // si la demande vient d'un utilisateur connecté
+    if (asker_id) {
+      //si la demande vient d'un manager retourne toutes les infos
+      if (await this.findManager({id_manager : asker_id})) return manager;
+    }
+    // sinon infos publiques seulement
     return {
       manager: {
         username: manager.username,
@@ -74,7 +81,7 @@ export class ManagerService {
     } = createManagerDto;
 
     //verifier si manager existe déjà
-    const manager = this.findManager({ email: email });
+    const manager = await this.findManager({ email: email });
     if (manager) throw new ConflictException('Ce manager existe déjà.');
 
     //hasher mot de passe
@@ -115,7 +122,7 @@ export class ManagerService {
   async update(
     id_manager: string,
     updateManagerDto: UpdateManagerDto,
-    asker_id: any,
+    asker_id: string,
   ) {
     // verifier que le manager existe
     const manager = await this.findManager({ id_manager: id_manager });
