@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
-import { AdminGuard } from 'src/common/guards/admin.guard';
 import { CreateGameDto } from './dto/createGameDto';
 import { Public } from 'src/common/decorators/PublicDecorator';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
