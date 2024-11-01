@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { DepositedGameController } from "./deposited-game.controller";
-import { ManagerServiceMock } from "src/manager/mocks/manager.services.mock";
+import { ManagerServiceMock } from "src/manager/mocks/manager.service.mock";
 import { ConfigService } from "@nestjs/config";
 import { ManagerService } from "src/manager/manager.service";
 import { ManagerGuard } from "src/common/guards/manager.guard";
@@ -66,32 +66,18 @@ describe('DepositedGameController', () => {
   describe('create', () => {
     it('should create a deposited game', async () => {
       controller.create = jest.fn().mockResolvedValue({ data: 'Jeu déposé créé avec succès !' });
-      const createDepositedGameDto = {
-        price: 19.99,
-        sold: false,
-        for_sale: true,
-        id_session: 1,
-        id_seller: '123e4567-e89b-12d3-a456-426614174000',
-        id_game: 1,
-      };
-      await expect(controller.create(createDepositedGameDto)).resolves.toEqual({ data: 'Jeu déposé créé avec succès !' });
-      expect(controller.create).toHaveBeenCalledWith(createDepositedGameDto);
+      const depositedGameMockDto = depositedGameMock;
+      await expect(controller.create(depositedGameMockDto)).resolves.toEqual({ data: 'Jeu déposé créé avec succès !' });
+      expect(controller.create).toHaveBeenCalledWith(depositedGameMockDto);
     });
   });
 
   describe('update', () => {
     it('should update a deposited game', async () => {
       controller.update = jest.fn().mockResolvedValue({ data: 'Jeu déposé mis à jour avec succès !' });
-      const updateDepositedGameDto = {
-        price: 19.99,
-        sold: false,
-        for_sale: true,
-        id_session: 1,
-        id_seller: '123e4567-e89b-12d3-a456-426614174000',
-        id_game: 1,
-      };
-      await expect(controller.update('tag', updateDepositedGameDto)).resolves.toEqual({ data: 'Jeu déposé mis à jour avec succès !' });
-      expect(controller.update).toHaveBeenCalledWith('tag', updateDepositedGameDto);
+      const DepositedGameMockDto = depositedGameMock
+      await expect(controller.update('tag', DepositedGameMockDto)).resolves.toEqual({ data: 'Jeu déposé mis à jour avec succès !' });
+      expect(controller.update).toHaveBeenCalledWith('tag', DepositedGameMockDto);
     });
   });
 

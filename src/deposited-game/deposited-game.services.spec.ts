@@ -2,8 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DepositedGameService } from './deposited-game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
-import { depositedGameMock } from './mocks/deposited-game.mock';
-import { Decimal } from '@prisma/client/runtime/library';
+import { createDepositedGameMock, depositedGameMock } from './mocks/deposited-game.mock';
 
 describe('DepositedGameService', () => {
   let service: DepositedGameService;
@@ -68,37 +67,23 @@ describe('DepositedGameService', () => {
 
   describe('create', () => {
     it('should create a deposited game', async () => {
-      const createDepositedGameDto = {
-        price: 19.99,
-        sold: false,
-        for_sale: true,
-        id_session: 1,
-        id_seller: '123e4567-e89b-12d3-a456-426614174000',
-        id_game: 1,
-      };
-      const result = await service.create(createDepositedGameDto);
+      const createDepositedGameMockDto = createDepositedGameMock
+      const result = await service.create(createDepositedGameMockDto);
       expect(result).toEqual({data: 'Jeu déposé créé avec succès !'});
       expect(prismaService.depositedGame.create).toHaveBeenCalledWith({
-        data: createDepositedGameDto,
+        data: createDepositedGameMockDto,
       });
     });
   });
 
   describe('update', () => {
     it('should update a deposited game', async () => {
-      const updateDepositedGameDto = {
-        price: 29.99,
-        sold: false,
-        for_sale: true,
-        id_session: 1,
-        id_seller: '123e4567-e89b-12d3-a456-426614174000',
-        id_game: 1,
-      };
-      const result = await service.update('tag1', updateDepositedGameDto);
+      const updateDepositedGameMockDto = createDepositedGameMock;
+      const result = await service.update('tag1', updateDepositedGameMockDto);
       expect(result).toEqual({data: 'Jeu déposé mis à jour avec succès !'});
       expect(prismaService.depositedGame.update).toHaveBeenCalledWith({
         where: { tag: 'tag1' },
-        data: updateDepositedGameDto,
+        data: updateDepositedGameMockDto,
       });
     });
   });
@@ -114,6 +99,6 @@ describe('DepositedGameService', () => {
   // Additional tests for NotFoundExceptions
   it('should throw NotFoundException if the game does not exist when creating', async () => {
     jest.spyOn(prismaService.game, 'findUnique').mockResolvedValue(null); // Mock to return null for game
-    await expect(service.create({ ...depositedGameMock, price: depositedGameMock.price.toNumber() })).rejects.toThrow(NotFoundException);
+    await expect(service.create({ ...depositedGameMock, price: depositedGameMock.price })).rejects.toThrow(NotFoundException);
   });
 });

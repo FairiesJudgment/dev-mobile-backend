@@ -36,6 +36,10 @@ export class GameService {
             id_category 
         } = createGameDto;
 
+        // vérifier si le jeu existe déjà
+        const game = await this.prismaService.game.findUnique({where: { name },});
+        if (game) { throw new ConflictException("Ce jeu existe déjà.");}
+
         // Vérifier si l'éditeur existe
         const editor = await this.prismaService.gameEditor.findUnique({where: { id_editor },});
         if (!editor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
@@ -43,10 +47,6 @@ export class GameService {
         // Vérifier si la catégorie existe
         const category = await this.prismaService.gameCategory.findUnique({where: { id_category },});
         if (!category) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
-
-        // vérifier si le jeu existe déjà
-        const game = await this.prismaService.game.findUnique({where: { name },});
-        if (game) { throw new ConflictException("Ce jeu existe déjà.");}
         
         // enregistrer le jeu en BD
         await this.prismaService.game.create({
@@ -82,6 +82,18 @@ export class GameService {
         const game = await this.prismaService.game.findUnique({where: { id_game: Number(id_game) },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
+        // vérifier si l'éditeur existe
+        const editor = await this.prismaService.gameEditor.findUnique({where: { id_editor },});
+        if (!editor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
+
+        // vérifier si la catégorie existe
+        const category = await this.prismaService.gameCategory.findUnique({where: { id_category },});
+        if (!category) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
+
+        // vérifier si le nom n'est pas déjà utilisé
+        const nameExist = await this.prismaService.game.findUnique({where: { name },});
+        if (nameExist && nameExist.id_game !== id_game) { throw new ConflictException("Ce nom de jeu existe déjà.");}
+
         // modifier le jeu en BD
         await this.prismaService.game.update({ where: { id_game: Number(id_game) },
             data: {
@@ -108,6 +120,6 @@ export class GameService {
         // supprimer le jeu en BD
         await this.prismaService.game.delete({where: { id_game: Number(id_game) },});
         // retourner message de succès
-        return { data: 'Jeu supprimé !' };
+        return { data: 'Jeu supprimé avec succès !' };
     }
 }
