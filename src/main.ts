@@ -10,7 +10,8 @@ async function bootstrap() {
 
   // Utiliser CORS
   app.use(cors({
-    origin: configService.get('FRONTEND_URL'),
+    origin: [configService.get('FRONTEND_URL'), configService.get('FRONTEND_URL2')],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
