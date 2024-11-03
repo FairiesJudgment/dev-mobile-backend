@@ -15,6 +15,8 @@ export class GameCategoryService {
 
     // récupérer une catégorie de jeu selon son id
     async get(id_category: number) {
+        // Verifier si id_category est défini
+        if (!id_category) { throw new NotFoundException("Vous devez fournir l'identifiant de la catégorie.");}
         // Vérifier si la catégorie existe
         const gameCategory = await this.prismaService.gameCategory.findUnique({where: { id_category: Number(id_category) },});
         if (!gameCategory) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}

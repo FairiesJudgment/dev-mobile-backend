@@ -13,6 +13,8 @@ export class GameEditorService {
 
     // récupérer un éditeur de jeu selon son id
     async get(id_editor: number) {
+        // Verifier si id_editor est défini
+        if (!id_editor) { throw new NotFoundException("Vous devez fournir l'identifiant de l'éditeur.");}
         // Vérifier si l'éditeur existe
         const gameEditor = await this.prismaService.gameEditor.findUnique({where: { id_editor: Number(id_editor) },});
         if (!gameEditor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}

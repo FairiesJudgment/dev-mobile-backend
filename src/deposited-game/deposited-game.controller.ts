@@ -16,7 +16,7 @@ export class DepositedGameController {
         return this.depositedGameService.getAll();
     }
 
-    @UseGuards(ManagerGuard)
+    @Public()
     @Get('/tag/:tag')
     get(@Param('tag') tag: string) {
         return this.depositedGameService.get(tag);
