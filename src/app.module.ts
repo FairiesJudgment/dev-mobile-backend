@@ -10,9 +10,10 @@ import { GameEditorModule } from './game-editor/game-editor.module';
 import { ClientModule } from './client/client.module';
 import { SessionModule } from './session/session.module';
 import { DepositedGameModule } from './deposited-game/deposited-game.module';
+import { SaleModule } from './sale/sale.module';
  
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, ClientModule, GameModule, GameCategoryModule, GameEditorModule, SessionModule, DepositedGameModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, ClientModule, GameModule, GameCategoryModule, GameEditorModule, SessionModule, DepositedGameModule, SaleModule],
   controllers: [],
   providers: [],
 })

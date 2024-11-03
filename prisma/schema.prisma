@@ -115,9 +115,9 @@ model DepositedGame {
 }
 
 enum PaymentMethod {
-  CREDIT_CARD
-  CASH
-  CHECK
+  credit_card
+  cash
+  check
 }
 
 model SaleTransaction {
