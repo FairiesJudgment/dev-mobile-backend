@@ -7,11 +7,11 @@ import { UpdateSessionDto } from './dto/updateSessionDto';
 export class SessionService {
     constructor(private readonly prismaService : PrismaService) {}
 
-    async findSession(id_session : number) {
+    async findSession(options : { id_session?: number, name?: string }) {
+        const { id_session, name } = options;
+        if (!name && !id_session) throw new Error("Vous devez fournir au moins un nom ou un id de session.")
         const session = this.prismaService.session.findUnique({
-            where: {
-                id_session,
-            },
+            where: id_session ? { id_session } : { name },
         });
         return session;
     }

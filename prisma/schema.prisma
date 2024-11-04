@@ -93,12 +93,16 @@ model Game {
 
 model Session {
   id_session     Int      @id @default(autoincrement())
+  name String @unique
   date_begin     DateTime
   date_end       DateTime
   deposit_fees   Decimal
   discount       Decimal
   comission_fees Decimal
   games DepositedGame[] @relation("session_games")
+  session_sales SaleTransaction[] @relation("session_sales")
+  session_recoveries RecoverTransaction[] @relation("session_recoveries")
+  session_deposits DepositTransaction[] @relation("session_deposits")
 }
 
 model DepositedGame {
@@ -129,9 +133,11 @@ model SaleTransaction {
   id_seller String
   id_client Int
   id_manager String
+  id_session Int
   seller Seller @relation("seller_sales", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
   client Client @relation("client_purchases", fields: [id_client], references: [id_client], onUpdate: Cascade, onDelete: Cascade)
   manager Manager @relation("manager_sales", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  session Session @relation("session_sales", fields : [id_session], references: [id_session], onUpdate: Cascade, onDelete: Cascade)
   game_in_sale GameInSaleTransaction[] @relation("game_in_sale")
 }
 
@@ -141,8 +147,10 @@ model RecoverTransaction {
   amount Decimal
   id_seller String
   id_manager String
+  id_session Int
   seller Seller @relation("seller_recoveries", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
   manager Manager @relation("manager_recoveries", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  session Session @relation("session_recoveries", fields : [id_session], references: [id_session], onUpdate: Cascade, onDelete: Cascade)
   game_in_recover GameInRecoverTransaction[] @relation("game_in_recover")
 }
 
@@ -154,8 +162,10 @@ model DepositTransaction {
   discount Decimal
   id_seller String
   id_manager String
+  id_session Int
   seller Seller @relation("seller_deposits", fields: [id_seller], references: [id_seller], onUpdate: Cascade, onDelete: Cascade)
   manager Manager @relation("manager_deposits", fields: [id_manager], references: [id_manager], onUpdate: Cascade, onDelete: Cascade)
+  session Session @relation("session_deposits", fields : [id_session], references: [id_session], onUpdate: Cascade, onDelete: Cascade)
   game_in_deposit GameInDepositTransaction[] @relation("game_in_deposit")
 }
 
