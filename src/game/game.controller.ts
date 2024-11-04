@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/createGameDto';
 import { Public } from 'src/common/decorators/PublicDecorator';
@@ -18,7 +18,7 @@ export class GameController {
 
     @Public()
     @Get(':id_game')
-    get(@Param('id_game') id_game: number) {
+    get(@Param('id_game', ParseIntPipe) id_game: number) {
         return this.gameService.get(id_game);
     }
 
@@ -30,13 +30,13 @@ export class GameController {
 
     @UseGuards(ManagerGuard)
     @Put(':id_game')
-    update(@Param('id_game') id_game: number, @Body() updateGameDto: UpdateGameDto) {
+    update(@Param('id_game', ParseIntPipe) id_game: number, @Body() updateGameDto: UpdateGameDto) {
         return this.gameService.update(id_game, updateGameDto);
     }
 
     @UseGuards(ManagerGuard)
     @Delete(':id_game')
-    delete(@Param('id_game') id_game: number) {
+    delete(@Param('id_game', ParseIntPipe) id_game: number) {
         return this.gameService.delete(id_game);
     }
 }

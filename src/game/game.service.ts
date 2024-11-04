@@ -16,7 +16,7 @@ export class GameService {
     // récupérer un jeu selon son id
     async get(id_game: number) {
         // Vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game: Number(id_game) },});
+        const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
         // Retourner les infos du jeu
         return game;
@@ -79,7 +79,7 @@ export class GameService {
         } = updateGameDto;
 
         // vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game: Number(id_game) },});
+        const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
         // vérifier si l'éditeur existe
@@ -95,7 +95,7 @@ export class GameService {
         if (nameExist && nameExist.id_game !== id_game) { throw new ConflictException("Ce nom de jeu existe déjà.");}
 
         // modifier le jeu en BD
-        await this.prismaService.game.update({ where: { id_game: Number(id_game) },
+        await this.prismaService.game.update({ where: { id_game },
             data: {
                 name,
                 description,
@@ -114,11 +114,11 @@ export class GameService {
     // supprimer un jeu
     async delete(id_game: number) {
         // vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game: Number(id_game) },});
+        const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
         // supprimer le jeu en BD
-        await this.prismaService.game.delete({where: { id_game: Number(id_game) },});
+        await this.prismaService.game.delete({where: { id_game },});
         // retourner message de succès
         return { data: 'Jeu supprimé avec succès !' };
     }
