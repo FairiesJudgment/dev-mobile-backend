@@ -11,7 +11,7 @@ export class SessionService {
         const { id_session, name } = options;
         if (!name && !id_session) throw new Error("Vous devez fournir au moins un nom ou un id de session.")
         const session = this.prismaService.session.findUnique({
-            where: id_session ? { id_session } : { name },
+            where: id_session ? { id_session } : { name : name },
         });
         return session;
     }
@@ -38,7 +38,7 @@ export class SessionService {
     
 
     async get(id_session: number) {
-        const session = await this.findSession(id_session);
+        const session = await this.findSession({ id_session : id_session });
 
         if (!session) throw new NotFoundException("Cette session n'existe pas.");
 
@@ -52,6 +52,9 @@ export class SessionService {
 
     async create(createSessionDto: CreateSessionDto) {
         const {date_begin, date_end} = createSessionDto;
+        // verifier qu'aucune session n'a la même nom
+        const session = await this.findSession({ name : createSessionDto.name });
+        if (session) throw new ConflictException("Ce nom de session est déjà pris.")
         // récupérer toutes les sessions existantes
         const sessions = await this.prismaService.session.findMany();
         // vérifier que nouvelle session ne se chevauche pas une autre
@@ -68,8 +71,14 @@ export class SessionService {
 
     async update(updateSessionDto: UpdateSessionDto, id_session: number) {
         // verifier que la session exsite
-        const session = await this.findSession(id_session);
+        const session = await this.findSession({ id_session : id_session} );
         if (!session) throw new NotFoundException("Cette session n'existe pas.");
+
+        if(updateSessionDto.name) {
+            // verifier que ce nom de session n'est pas pris
+            const nameCheck = await this.findSession({name : updateSessionDto.name});
+            if (nameCheck && nameCheck.id_session !== session.id_session) throw new ConflictException("Ce nom de session est déjà pris.")
+        }
 
         // récupérer nouvelles dates si elles existent
         const newDateBegin = updateSessionDto.date_begin || session.date_begin;
@@ -99,7 +108,7 @@ export class SessionService {
 
     async delete(id_session: number) {
         // verifier que la session exsite
-        const session = await this.findSession(id_session);
+        const session = await this.findSession({ id_session : id_session });
         if (!session) throw new NotFoundException("Cette session n'existe pas.");
 
         await this.prismaService.session.delete({
