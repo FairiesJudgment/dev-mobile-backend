@@ -89,6 +89,11 @@ export class DepositedGameService {
     }
 
     // mettre à jour un jeu déposé
+    // si il y a plusieurs jeux déposés avec le meme id_game, id_session et id_seller:
+    // - on les met tous à jour
+    // conditions à vérifier:
+    // - le jeu déposé existe
+    // - le jeu n'est pas vendu
     async update(tag: string, updateDepositedGameDto: UpdateDepositedGameDto) {
 
         const {
@@ -105,20 +110,28 @@ export class DepositedGameService {
         if (!depositedGame) { throw new NotFoundException("Ce jeu déposé n'existe pas.");}
 
         // Vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game },});
-        if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
+        if (id_game) {
+            const game = await this.prismaService.game.findUnique({where: { id_game },});
+            if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
+        }
 
         // Vérifier si la session existe
-        const session = await this.prismaService.session.findUnique({where: { id_session },});
-        if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
+        if (id_session) {
+            const session = await this.prismaService.session.findUnique({where: { id_session },});
+            if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
+        }
 
         // Vérifier si le vendeur existe
+        if (id_seller) {
         const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
         if (!seller) { throw new NotFoundException("Ce vendeur n'existe pas.");}
-        
+        }
+
         // mettre à jour le jeu déposé en BD
-        await this.prismaService.depositedGame.update({
-            where: { tag },
+        // si il y a plusieurs jeux déposés avec le meme id_game, id_session et id_seller:
+        // - on les met tous à jour
+        await this.prismaService.depositedGame.updateMany({
+            where: { id_game, id_seller, id_session, sold: false },
             data: {
                 price,
                 sold,
