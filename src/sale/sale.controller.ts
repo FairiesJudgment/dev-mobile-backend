@@ -59,7 +59,7 @@ export class SaleController {
     }
 
     @UseGuards(ManagerGuard)
-    @Delete(':/id_sale')
+    @Delete('/:id_sale')
     delete(@Param('id_sale') id_sale : string) {
         return this.saleService.delete(id_sale);
     }

@@ -145,24 +145,42 @@ export class SaleService {
     }
 
     async create(createSaleDto: CreateSaleDto, id_manager: any) {
-        const { games_sold } = createSaleDto;
+        const {date, amount, comission, payment_method, id_seller, id_client, id_session, games_sold } = createSaleDto;
         const sale = await this.prismaService.saleTransaction.create({
             data : {
-                ...createSaleDto,
+                date,
+                amount,
+                comission,
+                payment_method,
+                id_seller,
+                id_client,
+                id_session,
                 id_manager,
             },
         });
 
-        const createPromises = games_sold.map((game) =>
-            this.prismaService.gameInSaleTransaction.create({
+        const createPromises = games_sold.map(async (game) => {
+            // creer la relation
+            await this.prismaService.gameInSaleTransaction.create({
                 data: {
                     id_sale: sale.id_sale,
                     id_game: game.id_game,
                     tags: game.tags,
                     quantity: game.quantity,
                 },
-            })
-        );
+            });
+            
+            // mettre à jour le statut des jeux déposés
+            await this.prismaService.depositedGame.updateMany({
+                where: {
+                    tag: { in: game.tags },
+                },
+                data: {
+                    sold: true,
+                    for_sale: false,
+                },
+            });
+        });
 
         await Promise.all(createPromises);
 
@@ -176,15 +194,15 @@ export class SaleService {
         // si aucune modif pour games_sold S'ASSURER que ce n'est pas envoyé ou que c'est vide
         // si modif partielle envoyer nouvelles + anciennes données à garder
         // car on supprime puis recrée les relations en bd, pas de réel update
-        const {games_sold} = updateSaleDto;
+        const {date, amount, comission, payment_method, id_seller, id_client, id_session, games_sold} = updateSaleDto;
 
         await this.prismaService.saleTransaction.update({
             where : {
                 id_sale,
             },
             data : {
-                ...updateSaleDto,
-            }
+                date, amount, comission, payment_method, id_seller, id_client, id_session,
+            },
         });
 
 
@@ -196,16 +214,28 @@ export class SaleService {
                 }
             });
     
-            const createPromises = games_sold.map((game) =>
-                this.prismaService.gameInSaleTransaction.create({
+            const createPromises = games_sold.map(async (game) => {
+                // creer la relation
+                await this.prismaService.gameInSaleTransaction.create({
                     data: {
-                        id_sale,
+                        id_sale: sale.id_sale,
                         id_game: game.id_game,
                         tags: game.tags,
                         quantity: game.quantity,
                     },
-                })
-            );
+                });
+                
+                // mettre à jour le statut des jeux déposés
+                await this.prismaService.depositedGame.updateMany({
+                    where: {
+                        tag: { in: game.tags },
+                    },
+                    data: {
+                        sold: true,
+                        for_sale: false,
+                    },
+                });
+            });
     
             await Promise.all(createPromises);
         }
@@ -224,13 +254,6 @@ export class SaleService {
             where : {
                 id_sale,
             }
-        });
-
-        // supprimer les relations de la vente
-        await this.prismaService.gameInSaleTransaction.deleteMany({
-            where : {
-                id_sale,
-            },
         });
 
         return { data : 'Vente supprimée avec succès !'};

@@ -8,8 +8,8 @@ PRISMA :
 
     after restarting docker :
         npx prisma generate
-        npx prisma migrate dev --name initial
-        node seed.js
+        npx prisma migrate dev --name init
+        npx ts-node prisma/seed.ts
 
     to access database infos :
         docker compose down (to shut down in case)
