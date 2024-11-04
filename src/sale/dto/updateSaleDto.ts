@@ -29,5 +29,8 @@ export class UpdateSaleDto {
     id_client : number;
     @IsOptional()
     @IsNotEmpty()
+    id_session : number;
+    @IsOptional()
+    @IsNotEmpty()
     games_sold : GameSold[];
 }

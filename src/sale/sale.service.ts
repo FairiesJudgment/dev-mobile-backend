@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/createSaleDto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateSaleDto } from './dto/updateSaleDto';
 
 @Injectable()
 export class SaleService {
@@ -64,7 +65,28 @@ export class SaleService {
     }
 
     async getBySession(id_session: number) {
-        // on a pas id_session en BD, rajouter ou non?
+        const sales = await this.prismaService.saleTransaction.findMany({
+            where : {
+                id_session,
+            },
+        });
+
+        if (!sales) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+
+        const saleIds = sales.map(sale => sale.id_sale);
+
+        const gamesInSales = await this.prismaService.gameInSaleTransaction.findMany({
+            where : {
+                id_sale : { in : saleIds },
+            },
+        });
+
+        const salesWithGameData = sales.map(sale => ({
+            ...sale,
+            game_data: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
+        }));
+    
+        return { data: salesWithGameData };
     }
 
     async getBySeller(id_seller: string) {
@@ -145,5 +167,65 @@ export class SaleService {
         await Promise.all(createPromises);
 
         return { data : 'Transaction enregistrée avec succès !'}
+    }
+
+    async update(updateSaleDto: UpdateSaleDto, id_sale: string) {
+        const sale = await this.findSale(id_sale);
+        if (!sale) throw new NotFoundException("Cette vente n'existe pas.");
+
+        const {games_sold} = updateSaleDto;
+
+        await this.prismaService.saleTransaction.update({
+            where : {
+                id_sale,
+            },
+            data : {
+                ...updateSaleDto,
+            }
+        });
+
+        await this.prismaService.gameInSaleTransaction.deleteMany({
+            where : {
+                id_sale,
+            }
+        });
+
+        const createPromises = games_sold.map((game) =>
+            this.prismaService.gameInSaleTransaction.create({
+                data: {
+                    id_sale,
+                    id_game: game.id_game,
+                    tags: game.tags,
+                    quantity: game.quantity,
+                },
+            })
+        );
+
+        await Promise.all(createPromises);
+        
+
+        return { data : 'Vente mise à jour avec succès !'}
+    }
+
+    async delete(id_sale: string) {
+        // vérifier que la vente existe
+        const sale = await this.findSale(id_sale);
+        if (!sale) throw new NotFoundException("Cette vente n'existe pas.");
+
+        // supprimer la vente
+        await this.prismaService.saleTransaction.delete({
+            where : {
+                id_sale,
+            }
+        });
+
+        // supprimer les relations de la vente
+        await this.prismaService.gameInSaleTransaction.deleteMany({
+            where : {
+                id_sale,
+            },
+        });
+
+        return { data : 'Vente supprimée avec succès !'};
     }
 }

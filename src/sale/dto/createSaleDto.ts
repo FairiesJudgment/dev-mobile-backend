@@ -22,5 +22,7 @@ export class CreateSaleDto {
     @IsNotEmpty()
     id_client : number;
     @IsNotEmpty()
+    id_session : number;
+    @IsNotEmpty()
     games_sold : GameSold[];
 }
