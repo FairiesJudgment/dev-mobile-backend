@@ -88,6 +88,14 @@ export class ManagerService {
       if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
     }
 
+    // vérifier si le pseudo n'est pas déjà utilisé
+    if (username) {
+      const manager = await this.findManager({ username: username });
+      if (manager) throw new ConflictException("Ce pseudo est déjà utilisé.");
+      const seller = await this.prismaService.seller.findUnique({where: { username: username },});
+      if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
+    }
+
     //hasher mot de passe
     const salt = uuid();
     const hash = await bcrypt.hash(password + salt, 10);
@@ -145,6 +153,14 @@ export class ManagerService {
       if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
       const seller = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email },});
       if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+    }
+
+    // verifier si le pseudo n'est pas déjà utilisé
+    if (updateManagerDto.username) {
+      const manager = await this.findManager({ username: updateManagerDto.username });
+      if (manager) throw new ConflictException("Ce pseudo est déjà utilisé.");
+      const seller = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username },});
+      if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
     }
     // appliquer modifications
     await this.prismaService.manager.update({

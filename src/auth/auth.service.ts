@@ -50,7 +50,6 @@ export class AuthService {
         email : user.email,
       }
     }
-    console.log(payload)
     const token = this.jwtService.sign(payload, {
       expiresIn : this.configService.get('TOKEN_DURATION'),
       secret : this.configService.get('TOKEN_SECRET'),

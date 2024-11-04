@@ -56,7 +56,6 @@ export class SellerService {
         }
     }
 
-
   async create(createSellerDto: CreateSellerDto) {
     const { username, email, password, firstname, lastname, phone, address } =
       createSellerDto;
@@ -67,7 +66,15 @@ export class SellerService {
         if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
         const manager = await this.managerService.findManager({ email: email });
         if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
-      }
+    }
+
+    // verifier si le username n'est pas déjà utilisé
+    if (username) {
+        const seller = await this.findSeller({ username: username });
+        if (seller) throw new ConflictException("Ce nom d'utilisateur est déjà utilisé par un vendeur.");
+        const manager = await this.managerService.findManager({ username: username });
+        if (manager) throw new ConflictException("Ce nom d'utilisateur est déjà utilisé par un manager.");
+    }      
 
     //hasher mdp
     const salt = uuid();
@@ -100,6 +107,7 @@ export class SellerService {
             const asker = await this.managerService.findManager({id_manager : asker_id});
             if (!asker) throw new UnauthorizedException("Opération interdite");
         }
+        
         // verifier que l'email n'est pas déjà utilisé
         if (updateSellerDto.email) {
             const seller = await this.findSeller({email : updateSellerDto.email});
@@ -107,6 +115,15 @@ export class SellerService {
             const manager = await this.managerService.findManager({email : updateSellerDto.email});
             if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
         }
+
+        // verifier que le username n'est pas déjà utilisé
+        if (updateSellerDto.username) {
+            const seller = await this.findSeller({username : updateSellerDto.username});
+            if (seller) throw new ConflictException("Ce nom d'utilisateur est déjà utilisé par un vendeur.");
+            const manager = await this.managerService.findManager({username : updateSellerDto.username});
+            if (manager) throw new ConflictException("Ce nom d'utilisateur est déjà utilisé par un manager.");
+        }
+
         // appliquer modifications
         await this.prismaService.seller.update({
             where : {
