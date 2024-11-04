@@ -3,6 +3,9 @@ import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 
 export class UpdateSessionDto {
     @IsOptional()
+    @IsNotEmpty()
+    name : string;
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
     date_begin : Date;
