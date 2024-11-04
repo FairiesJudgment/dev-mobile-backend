@@ -149,6 +149,7 @@ model RecoverTransaction {
 model DepositTransaction {
   id_deposit String @id @default(uuid())
   date DateTime @default(now())
+  amount Decimal
   fees Decimal
   discount Decimal
   id_seller String

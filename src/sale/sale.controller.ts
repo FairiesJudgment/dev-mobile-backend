@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { SaleService } from './sale.service';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
-import { CreateSaleDto } from './createSaleDto';
+import { CreateSaleDto } from './dto/createSaleDto';
 import { Request } from 'express';
 
 @Controller('sales')
