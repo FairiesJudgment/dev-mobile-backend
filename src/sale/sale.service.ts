@@ -173,6 +173,9 @@ export class SaleService {
         const sale = await this.findSale(id_sale);
         if (!sale) throw new NotFoundException("Cette vente n'existe pas.");
 
+        // si aucune modif pour games_sold S'ASSURER que ce n'est pas envoyé ou que c'est vide
+        // si modif partielle envoyer nouvelles + anciennes données à garder
+        // car on supprime puis recrée les relations en bd, pas de réel update
         const {games_sold} = updateSaleDto;
 
         await this.prismaService.saleTransaction.update({
@@ -184,24 +187,28 @@ export class SaleService {
             }
         });
 
-        await this.prismaService.gameInSaleTransaction.deleteMany({
-            where : {
-                id_sale,
-            }
-        });
 
-        const createPromises = games_sold.map((game) =>
-            this.prismaService.gameInSaleTransaction.create({
-                data: {
+        //s'il faut modifier les relations
+        if (games_sold && games_sold.length !== 0) {
+            await this.prismaService.gameInSaleTransaction.deleteMany({
+                where : {
                     id_sale,
-                    id_game: game.id_game,
-                    tags: game.tags,
-                    quantity: game.quantity,
-                },
-            })
-        );
-
-        await Promise.all(createPromises);
+                }
+            });
+    
+            const createPromises = games_sold.map((game) =>
+                this.prismaService.gameInSaleTransaction.create({
+                    data: {
+                        id_sale,
+                        id_game: game.id_game,
+                        tags: game.tags,
+                        quantity: game.quantity,
+                    },
+                })
+            );
+    
+            await Promise.all(createPromises);
+        }
         
 
         return { data : 'Vente mise à jour avec succès !'}

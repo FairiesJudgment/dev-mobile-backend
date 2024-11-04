@@ -30,6 +30,9 @@ export class UpdateSaleDto {
     @IsOptional()
     @IsNotEmpty()
     id_session : number;
+    // si aucune modif pour games_sold S'ASSURER que ce n'est pas envoyé
+    // si modif partielle envoyer nouvelles + anciennes données à garder
+    // car on supprime puis recrée les relations en bd, pas de réel update
     @IsOptional()
     @IsNotEmpty()
     games_sold : GameSold[];
