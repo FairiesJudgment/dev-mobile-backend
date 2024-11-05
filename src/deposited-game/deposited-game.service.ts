@@ -50,46 +50,7 @@ export class DepositedGameService {
         return await this.prismaService.depositedGame.findMany({where: { id_seller },});
     }
 
-    // créer un jeu déposé
-    async create(createDepositedGameDto: CreateDepositedGameDto) {
-
-        const {
-            price,
-            sold = false,
-            for_sale,
-            id_game,
-            id_session,
-            id_seller,
-        } = createDepositedGameDto;
-
-        // Vérifier si le jeu existe
-        const game = await this.prismaService.game.findUnique({where: { id_game },});
-        if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
-
-        // Vérifier si la session existe
-        const session = await this.prismaService.session.findUnique({where: { id_session },});
-        if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
-
-        // Vérifier si le vendeur existe
-        const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
-        if (!seller) { throw new NotFoundException("Ce vendeur n'existe pas.");}
-        
-        // enregistrer le jeu déposé en BD
-        await this.prismaService.depositedGame.create({
-            data: {
-                price,
-                sold,
-                for_sale,
-                id_game,
-                id_session,
-                id_seller
-            }
-        });
-        // retourner message de succès
-        return { data: 'Jeu déposé créé avec succès !' };
-    }
-
-    // créer plusieurs jeux déposés
+    // créer un ou plusieurs jeux déposés
     async createMany(createManyDepositedGameDto: CreateManyDepositedGameDto) {
 
         const {
@@ -101,8 +62,12 @@ export class DepositedGameService {
             id_seller,
         } = createManyDepositedGameDto;
 
-        // Vérifier si la quantité est supérieure à 0 et for_sale est inférieur ou égal
+        // Vérifier si :
+        // - la quantité est supérieure à 0
+        // - la quantité en vente est supérieure à 0
+        // - la quantité en vente est inférieur ou égale à la quantité
         if (quantity <= 0) { throw new NotFoundException("La quantité doit être supérieure à 0.");}
+        if (number_for_sale < 0) { throw new NotFoundException("La quantité en vente doit être supérieure à 0.");}
         if (number_for_sale > quantity) { throw new NotFoundException("La quantité en vente doit être inférieur ou égale à la quantité.");}
 
         // Vérifier si le jeu existe
