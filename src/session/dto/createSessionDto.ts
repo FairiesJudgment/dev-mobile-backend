@@ -1,8 +1,10 @@
 import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty } from "class-validator";
+import { IsDate, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateSessionDto {
+    
     @IsNotEmpty()
+    @IsString()
     name : string;
     @IsDate()
     @Type(() => Date)

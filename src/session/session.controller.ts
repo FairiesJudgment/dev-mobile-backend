@@ -16,6 +16,12 @@ export class SessionController {
     }
 
     @Public()
+    @Get('/opened')
+    getOpened() {
+        return this.sessionService.getOpened();
+    }
+
+    @Public()
     @Get('/:id')
     get(@Param('id') id_session : number) {
         return this.sessionService.get(id_session);

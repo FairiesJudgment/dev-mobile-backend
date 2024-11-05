@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   controllers: [SessionController],
   providers: [SessionService],
-  imports: [JwtModule.register({})]
+  imports: [JwtModule.register({})],
+  exports: [SessionService]
 })
 export class SessionModule {}

@@ -93,7 +93,7 @@ model Game {
 
 model Session {
   id_session     Int      @id @default(autoincrement())
-  name String @unique
+  name           String   @unique
   date_begin     DateTime
   date_end       DateTime
   deposit_fees   Decimal
