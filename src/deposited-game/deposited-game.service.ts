@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDepositedGameDto } from './dto/createDepositedGameDto';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
+import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';
 
 @Injectable()
 export class DepositedGameService {
@@ -54,7 +55,7 @@ export class DepositedGameService {
 
         const {
             price,
-            sold,
+            sold = false,
             for_sale,
             id_game,
             id_session,
@@ -86,6 +87,66 @@ export class DepositedGameService {
         });
         // retourner message de succès
         return { data: 'Jeu déposé créé avec succès !' };
+    }
+
+    // créer plusieurs jeux déposés
+    async createMany(createManyDepositedGameDto: CreateManyDepositedGameDto) {
+
+        const {
+            price,
+            quantity,
+            number_for_sale,
+            id_game,
+            id_session,
+            id_seller,
+        } = createManyDepositedGameDto;
+
+        // Vérifier si la quantité est supérieure à 0 et for_sale est inférieur ou égal
+        if (quantity <= 0) { throw new NotFoundException("La quantité doit être supérieure à 0.");}
+        if (number_for_sale > quantity) { throw new NotFoundException("La quantité en vente doit être inférieur ou égale à la quantité.");}
+
+        // Vérifier si le jeu existe
+        const game = await this.prismaService.game.findUnique({where: { id_game },});
+        if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
+
+        // Vérifier si la session existe
+        const session = await this.prismaService.session.findUnique({where: { id_session },});
+        if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
+
+        // Vérifier si le vendeur existe
+        const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
+        if (!seller) { throw new NotFoundException("Ce vendeur n'existe pas.");}
+        
+        // enregistrer les jeux déposés en BD
+        for (let i = 0; i < number_for_sale; i++) {
+            await this.prismaService.depositedGame.create({
+                data: {
+                    price,
+                    sold : false,
+                    for_sale :  true,
+                    id_game,
+                    id_session,
+                    id_seller
+                }
+            });
+        }
+
+        for (let i = 0; i < quantity - number_for_sale; i++) {
+            await this.prismaService.depositedGame.create({
+                data: {
+                    price,
+                    sold : false,
+                    for_sale : false,
+                    id_game,
+                    id_session,
+                    id_seller
+                }
+            });
+        }
+
+        // retourner message de succès
+        return { data: 'Jeux déposés créés avec succès !' };
+
     }
 
     // mettre à jour un jeu déposé
