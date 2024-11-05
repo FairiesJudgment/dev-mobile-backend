@@ -42,13 +42,7 @@ export class DepositedGameController {
     }
 
     @UseGuards(ManagerGuard)
-    @Post()
-    create(@Body() createDepositedGameDto: CreateDepositedGameDto) {
-        return this.depositedGameService.create(createDepositedGameDto);
-    }
-
-    @UseGuards(ManagerGuard)
-    @Post('/many')
+    @Post('')
     updateMany(@Body() CreateManyDepositedGameDto: CreateManyDepositedGameDto) {
         return this.depositedGameService.createMany(CreateManyDepositedGameDto);
     }
