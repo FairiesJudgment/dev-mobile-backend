@@ -4,6 +4,7 @@ import { Public } from 'src/common/decorators/PublicDecorator';
 import { CreateDepositedGameDto } from './dto/createDepositedGameDto';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
+import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';
 
 @Controller('deposited-game')
 export class DepositedGameController {
@@ -44,6 +45,12 @@ export class DepositedGameController {
     @Post()
     create(@Body() createDepositedGameDto: CreateDepositedGameDto) {
         return this.depositedGameService.create(createDepositedGameDto);
+    }
+
+    @UseGuards(ManagerGuard)
+    @Post('/many')
+    updateMany(@Body() CreateManyDepositedGameDto: CreateManyDepositedGameDto) {
+        return this.depositedGameService.createMany(CreateManyDepositedGameDto);
     }
 
     @UseGuards(ManagerGuard)
