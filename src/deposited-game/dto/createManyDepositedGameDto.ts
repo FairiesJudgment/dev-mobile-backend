@@ -13,10 +13,6 @@ export class CreateManyDepositedGameDto {
   @IsNotEmpty()
   number_for_sale: number;
 
-  @IsInt()
-  @IsNotEmpty()
-  id_session: number;
-
   @IsString()
   @IsNotEmpty()
   id_seller: string;

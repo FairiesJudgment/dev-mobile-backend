@@ -22,6 +22,12 @@ export class GameController {
         return this.gameService.get(id_game);
     }
 
+    @Public()
+    @Get('/name/:name')
+    getByName(@Param('name') name: string) {
+        return this.gameService.getByName(name);
+    }
+
     @UseGuards(ManagerGuard)
     @Post()
     create(@Body() createGameDto: CreateGameDto) {

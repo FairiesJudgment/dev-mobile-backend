@@ -22,6 +22,15 @@ export class GameService {
         return game;
     }
 
+    // récupérer un jeu selon son nom
+    async getByName(name: string) {
+        // Vérifier si le jeu existe
+        const game = await this.prismaService.game.findUnique({where: { name },});
+        if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
+        // Retourner les infos du jeu
+        return game;
+    }
+
     // créer un jeu
     async create(createGameDto: CreateGameDto) {
 

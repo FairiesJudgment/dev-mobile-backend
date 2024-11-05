@@ -36,6 +36,19 @@ export class SessionService {
         });
     }
     
+    // recupere une session ouverte actuallement
+    async getOpened() {
+        const now = new Date();
+        const session = await this.prismaService.session.findFirst({
+            where: {
+                date_begin: { lte: now },
+                date_end: { gte: now },
+            },
+        });
+        if (!session) throw new NotFoundException("Aucune session ouverte actuellement.");
+
+        return session;
+    }
 
     async get(id_session: number) {
         const session = await this.findSession(id_session);
@@ -56,6 +69,14 @@ export class SessionService {
         const sessions = await this.prismaService.session.findMany();
         // vérifier que nouvelle session ne se chevauche pas une autre
         if (this.isConflict(sessions, date_begin, date_end)) throw new ConflictException("Il ne peut y avoir qu'une seule session ouverte à la fois.");
+        // verifier qu'un name n'est pas déjà utilisé
+        const session = await this.prismaService.session.findFirst({
+            where: {
+                name : createSessionDto.name,
+            },
+        });
+        if (session) throw new ConflictException("Ce nom de session est déjà utilisé.");
+
 
         await this.prismaService.session.create({
             data : {
@@ -84,6 +105,13 @@ export class SessionService {
         // vérifier que nouvelle session ne se chevauche pas une autre
         if (this.isConflict(sessions, newDateBegin, newDateEnd)) throw new ConflictException("Il ne peut y avoir qu'une seule session ouverte à la fois.");
 
+        // verifier qu'un name n'est pas déjà utilisé
+        const sessionName = await this.prismaService.session.findFirst({
+            where: {
+                name : updateSessionDto.name,
+            },
+        });
+        if (sessionName) throw new ConflictException("Ce nom de session est déjà utilisé.");
 
         await this.prismaService.session.update({
             where: {

@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { DepositedGameService } from './deposited-game.service';
 import { Public } from 'src/common/decorators/PublicDecorator';
-import { CreateDepositedGameDto } from './dto/createDepositedGameDto';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
 import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';

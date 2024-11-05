@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateDepositedGameDto } from './dto/createDepositedGameDto';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
 import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class DepositedGameService {
 
-    constructor( private readonly prismaService: PrismaService) {}
+    constructor( private readonly prismaService: PrismaService,
+                 private readonly sessionService: SessionService
+    ) {}
 
     // récupérer tous les jeux déposés
     async getAll() {
@@ -58,7 +60,6 @@ export class DepositedGameService {
             quantity,
             number_for_sale,
             id_game,
-            id_session,
             id_seller,
         } = createManyDepositedGameDto;
 
@@ -74,9 +75,10 @@ export class DepositedGameService {
         const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
-        // Vérifier si la session existe
-        const session = await this.prismaService.session.findUnique({where: { id_session },});
-        if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
+        // Trouver la session ouverte
+        const session = await this.sessionService.getOpened();
+        if (!session) { throw new NotFoundException("Il n'y a pas de session ouverte.");}
+        const id_session = session.id_session;
 
         // Vérifier si le vendeur existe
         const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
