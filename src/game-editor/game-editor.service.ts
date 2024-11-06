@@ -29,6 +29,10 @@ export class GameEditorService {
         const gameEditor = await this.prismaService.gameEditor.findUnique({where: { name },});
         if (gameEditor) { throw new ConflictException("Cet éditeur de jeu existe déjà.");}
 
+        // vérifier si le nom de l'éditeur n'existe pas déjà
+        const gameEditorName = await this.prismaService.gameEditor.findUnique({where: { name },});
+        if (gameEditorName) { throw new ConflictException("Ce nom d'éditeur existe déjà.");}
+
         // enregistrer l'éditeur en BD
         await this.prismaService.gameEditor.create({
             data: {
@@ -48,6 +52,10 @@ export class GameEditorService {
         const gameEditor = await this.prismaService.gameEditor.findUnique({where: { id_editor: Number(id_editor) }});
         if (!gameEditor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
 
+        // vérifier si le nom de l'éditeur n'existe pas déjà
+        const gameEditorName = await this.prismaService.gameEditor.findUnique({where: { name },});
+        if (gameEditorName) { throw new ConflictException("Ce nom d'éditeur existe déjà.");}
+        
         // modifier l'éditeur en BD
         await this.prismaService.gameEditor.update({
             where: { id_editor: Number(id_editor) },

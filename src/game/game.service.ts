@@ -45,6 +45,9 @@ export class GameService {
             id_category 
         } = createGameDto;
 
+        // verifier si les joueurs et l'âge sont positifs
+        if (min_players < 0 || max_players < 0 || min_age < 0 || max_age < 0) { throw new ConflictException("Les nombres de joueurs et l'âge doivent être positifs.");}
+
         // verifier si min_players est inférieur ou égal à max_players
         if (min_players > max_players) { throw new ConflictException("Le nombre de joueurs minimum doit être inférieur ou égal au nombre de joueurs maximum.");}
 
@@ -93,6 +96,9 @@ export class GameService {
             id_category 
         } = updateGameDto;
 
+        // vérifier si les joueurs et l'âge sont positifs
+        if (min_players < 0 || max_players < 0 || min_age < 0 || max_age < 0) { throw new ConflictException("Les nombres de joueurs et l'âge doivent être positifs.");}
+
         // vérifier si min_players est inférieur ou égal à max_players
         if (min_players > max_players) { throw new ConflictException("Le nombre de joueurs minimum doit être inférieur ou égal au nombre de joueurs maximum.");}
 
@@ -103,14 +109,19 @@ export class GameService {
         const game = await this.prismaService.game.findUnique({where: { id_game },});
         if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
 
+
         // vérifier si l'éditeur existe
-        const editor = await this.prismaService.gameEditor.findUnique({where: { id_editor },});
-        if (!editor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
+        if (id_editor) {    
+            const editor = await this.prismaService.gameEditor.findUnique({where: { id_editor },});
+            if (!editor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
+        }
 
         // vérifier si la catégorie existe
-        const category = await this.prismaService.gameCategory.findUnique({where: { id_category },});
-        if (!category) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
-
+        if (id_category) {
+            const category = await this.prismaService.gameCategory.findUnique({where: { id_category },});
+            if (!category) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
+        }
+        
         // vérifier si le nom n'est pas déjà utilisé
         const nameExist = await this.prismaService.game.findUnique({where: { name },});
         if (nameExist && nameExist.id_game !== id_game) { throw new ConflictException("Ce nom de jeu existe déjà.");}
