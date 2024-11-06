@@ -45,6 +45,12 @@ export class GameService {
             id_category 
         } = createGameDto;
 
+        // verifier si min_players est inférieur ou égal à max_players
+        if (min_players > max_players) { throw new ConflictException("Le nombre de joueurs minimum doit être inférieur ou égal au nombre de joueurs maximum.");}
+
+        // verifier si min_age est inférieur ou égal à max_age
+        if (min_age > max_age) { throw new ConflictException("L'âge minimum doit être inférieur ou égal à l'âge maximum.");}
+
         // vérifier si le jeu existe déjà
         const game = await this.prismaService.game.findUnique({where: { name },});
         if (game) { throw new ConflictException("Ce jeu existe déjà.");}
@@ -86,6 +92,12 @@ export class GameService {
             id_editor,
             id_category 
         } = updateGameDto;
+
+        // vérifier si min_players est inférieur ou égal à max_players
+        if (min_players > max_players) { throw new ConflictException("Le nombre de joueurs minimum doit être inférieur ou égal au nombre de joueurs maximum.");}
+
+        // vérifier si min_age est inférieur ou égal à max_age
+        if (min_age > max_age) { throw new ConflictException("L'âge minimum doit être inférieur ou égal à l'âge maximum.");}
 
         // vérifier si le jeu existe
         const game = await this.prismaService.game.findUnique({where: { id_game },});
