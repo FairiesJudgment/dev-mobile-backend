@@ -123,9 +123,11 @@ export class GameService {
         }
         
         // vérifier si le nom n'est pas déjà utilisé
-        const nameExist = await this.prismaService.game.findUnique({where: { name },});
-        if (nameExist && nameExist.id_game !== id_game) { throw new ConflictException("Ce nom de jeu existe déjà.");}
-
+        if (name) {
+            const nameExist = await this.prismaService.game.findUnique({where: { name },});
+            if (nameExist && nameExist.id_game !== id_game) { throw new ConflictException("Ce nom de jeu existe déjà.");}
+        }
+        
         // modifier le jeu en BD
         await this.prismaService.game.update({ where: { id_game },
             data: {

@@ -56,8 +56,10 @@ export class GameCategoryService {
         if (!gameCategory) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
 
         // vérifier si le nom de la catégorie n'existe pas déjà
-        const gameCategoryName = await this.prismaService.gameCategory.findUnique({where: { name },});
-        if (gameCategoryName) { throw new ConflictException("Ce nom de catégorie existe déjà.");}
+        if (name) {
+            const gameCategoryName = await this.prismaService.gameCategory.findUnique({where: { name },});
+            if (gameCategoryName) { throw new ConflictException("Ce nom de catégorie existe déjà.");}
+        }
 
         // modifier la catégorie en BD
         await this.prismaService.gameCategory.update({
