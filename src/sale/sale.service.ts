@@ -184,7 +184,7 @@ export class SaleService {
 
         await Promise.all(createPromises);
 
-        return { data : 'Transaction enregistrée avec succès !'}
+        return { data : 'Vente enregistrée avec succès !'}
     }
 
     async update(updateSaleDto: UpdateSaleDto, id_sale: string) {
@@ -208,12 +208,44 @@ export class SaleService {
 
         //s'il faut modifier les relations
         if (games_sold && games_sold.length !== 0) {
+            // Step 1: retrouver les anciennes relations
+            const relations = await this.prismaService.gameInSaleTransaction.findMany({
+                where: {
+                    id_sale,
+                },
+                select: {
+                    tags: true,
+                },
+            });
+
+            // Step 2: Extract all unique tags from the relations
+            const tags = relations.flatMap((relation) => relation.tags);
+
+            // Step 3: Update each depositedGame's sold attribute to false by its tag
+            const updatePromises = tags.map((tag) =>
+                this.prismaService.depositedGame.update({
+                    where: { 
+                        tag 
+                    },
+                    data: { 
+                        sold: false 
+                    },
+                })
+            );
+
+            // Step 4: Execute all updates concurrently
+            await Promise.all(updatePromises);
+
+
+            //supprimer les anciennes relations
             await this.prismaService.gameInSaleTransaction.deleteMany({
                 where : {
                     id_sale,
                 }
             });
-    
+            
+
+            //recréer avec les nouvelles données
             const createPromises = games_sold.map(async (game) => {
                 // creer la relation
                 await this.prismaService.gameInSaleTransaction.create({
@@ -248,6 +280,34 @@ export class SaleService {
         // vérifier que la vente existe
         const sale = await this.findSale(id_sale);
         if (!sale) throw new NotFoundException("Cette vente n'existe pas.");
+
+        // Step 1: retrouver les relations
+        const relations = await this.prismaService.gameInSaleTransaction.findMany({
+            where: {
+                id_sale,
+            },
+            select: {
+                tags: true,
+            },
+        });
+
+        // Step 2: Extract all unique tags from the relations
+        const tags = relations.flatMap((relation) => relation.tags);
+
+        // Step 3: Update each depositedGame's sold attribute to false by its tag
+        const updatePromises = tags.map((tag) =>
+            this.prismaService.depositedGame.update({
+                where: { 
+                    tag 
+                },
+                data: { 
+                    sold: false 
+                },
+            })
+        );
+
+        // Step 4: Execute all updates concurrently
+        await Promise.all(updatePromises);
 
         // supprimer la vente
         await this.prismaService.saleTransaction.delete({

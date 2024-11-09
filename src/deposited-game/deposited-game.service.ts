@@ -52,6 +52,45 @@ export class DepositedGameService {
         return await this.prismaService.depositedGame.findMany({where: { id_seller },});
     }
 
+    //creer les jeux déposés
+    async create(games_deposited: { id_game: number; quantity: number; price: number; nb_for_sale: number; }[], id_seller: string, id_session: number) {
+        //array à retourner à la fin
+        const gameTagsArray: { id_game: number; tags: string[] , quantity : number;}[] = [];
+        // pour chaque jeu
+        for (const game of games_deposited) {
+            // creer "quantity" deposited games 
+            const gamePromises = Array.from({ length: game.quantity }, (_, index) => {
+                // index = nombre de jeux déposés créés
+                const for_sale = index < game.nb_for_sale;
+                const depositedGame =  this.prismaService.depositedGame.create({
+                    data: {
+                        id_game: game.id_game,
+                        id_seller,
+                        id_session,
+                        price: game.price,
+                        sold: false,
+                        for_sale,
+                    },
+                    select : {
+                        tag : true,
+                    },
+                });
+                return depositedGame;
+            });
+            // Execute all promises concurrently
+            const depositedGames = await Promise.all(gamePromises);
+            // extraire les tags en une liste
+            const tags = depositedGames.flatMap((createdGame) => createdGame.tag || []);
+            // ajouter un objet pour le jeu
+            gameTagsArray.push({
+                id_game: game.id_game,
+                tags,
+                quantity : game.quantity,
+            });
+        };
+        return gameTagsArray;
+    }
+
     // créer un ou plusieurs jeux déposés
     async createMany(createManyDepositedGameDto: CreateManyDepositedGameDto) {
 
