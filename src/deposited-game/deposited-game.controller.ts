@@ -4,6 +4,7 @@ import { Public } from 'src/common/decorators/PublicDecorator';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
 import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';
+import { SessionGuard } from 'src/common/guards/session.guard';
 
 @Controller('deposited-game')
 export class DepositedGameController {
@@ -40,20 +41,20 @@ export class DepositedGameController {
         return this.depositedGameService.getBySeller(id_seller);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(ManagerGuard, SessionGuard)
     @Post('')
     updateMany(@Body() CreateManyDepositedGameDto: CreateManyDepositedGameDto) {
         return this.depositedGameService.createMany(CreateManyDepositedGameDto);
     }
 
-    @UseGuards(ManagerGuard)
-    @Put(':tag')
+    @UseGuards(ManagerGuard, SessionGuard)
+    @Put('/:tag')
     update(@Param('tag') tag: string, @Body() updateDepositedGameDto: UpdateDepositedGameDto) {
         return this.depositedGameService.update(tag, updateDepositedGameDto);
     }
 
     @UseGuards(ManagerGuard)
-    @Delete(':tag')
+    @Delete('/:tag')
     delete(@Param('tag') tag: string) {
         return this.depositedGameService.delete(tag);
     }

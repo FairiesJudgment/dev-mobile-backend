@@ -11,9 +11,11 @@ import { ClientModule } from './client/client.module';
 import { SessionModule } from './session/session.module';
 import { DepositedGameModule } from './deposited-game/deposited-game.module';
 import { SaleModule } from './sale/sale.module';
+import { DepositModule } from './deposit/deposit.module';
+import { RecoverModule } from './recover/recover.module';
  
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, ClientModule, GameModule, GameCategoryModule, GameEditorModule, SessionModule, DepositedGameModule, SaleModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, ManagerModule, SellerModule, ClientModule, GameModule, GameCategoryModule, GameEditorModule, SessionModule, DepositedGameModule, SaleModule, DepositModule, RecoverModule],
   controllers: [],
   providers: [],
 })
