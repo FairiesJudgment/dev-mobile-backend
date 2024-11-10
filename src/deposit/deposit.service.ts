@@ -15,7 +15,7 @@ export class DepositService {
             where : { id_game },
         });
 
-        if (!gamesInDeposits) throw new NotFoundException("Ce jeu n'apparaît dans aucune transaction de vente.");
+        if (!gamesInDeposits.length) throw new NotFoundException("Ce jeu n'apparaît dans aucun dépôt.");
 
         const depositIds = gamesInDeposits.map(game_deposit => game_deposit.id_deposit);
 
@@ -40,7 +40,7 @@ export class DepositService {
             },
         });
 
-        if (!deposits) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!deposits.length) throw new NotFoundException("Aucun dépôt pour cette session.");
 
         const depositIds = deposits.map(deposit => deposit.id_deposit);
 
@@ -65,7 +65,7 @@ export class DepositService {
             },
         });
 
-        if (!deposits) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!deposits.length) throw new NotFoundException("Ce vendeur n'a fait aucun dépôt.");
 
         const depositIds = deposits.map(deposit => deposit.id_deposit);
 
@@ -90,7 +90,7 @@ export class DepositService {
             },
         });
 
-        if (!deposit) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!deposit) throw new NotFoundException("Ce dépôt n'existe pas.");
 
 
         const gamesInDeposit = await this.prismaService.gameInDepositTransaction.findMany({
@@ -109,7 +109,7 @@ export class DepositService {
 
     async getAll() {
         const deposits = await this.prismaService.depositTransaction.findMany();
-        if(!deposits) throw new NotFoundException("Il n'y a aucune vente.");
+        if(!deposits.length) throw new NotFoundException("Il n'y a aucun dépôt.");
         return deposits;
     }
 
@@ -159,6 +159,7 @@ export class DepositService {
     }
 
     async update(id_deposit: string, updateDepositDto: UpdateDepositDto) {
+        const {date, amount, fees, discount, id_seller, id_session} = updateDepositDto;
         // verifier que le depot existe
         const deposit = await this.findDeposit(id_deposit);
         if (!deposit) throw new NotFoundException("Ce dépôt n'existe pas.");
@@ -168,8 +169,13 @@ export class DepositService {
                 id_deposit,
             },
             data : {
-                ...updateDepositDto,
-            }
+                date,
+                amount,
+                fees,
+                discount,
+                id_seller,
+                id_session,
+            },
         });
 
         return {data : 'Dépôt modifié avec succès !'};
@@ -193,10 +199,11 @@ export class DepositService {
         const tags = relations.flatMap((relation) => relation.tags);
 
         // supprimer les jeux déposés
-        // attention, aucune sécurité mise en place au cas où les jeux auraient été vendus
+        // sauf les jeux vendus
         await this.prismaService.depositedGame.deleteMany({
             where : {
                 tag : { in : tags },
+                sold : false,
             }
         });
 

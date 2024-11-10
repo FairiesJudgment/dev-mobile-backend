@@ -21,7 +21,7 @@ export class SaleService {
             where : { id_game },
         });
 
-        if (!gamesInSales) throw new NotFoundException("Ce jeu n'apparaît dans aucune transaction de vente.");
+        if (!gamesInSales.length) throw new NotFoundException("Ce jeu n'apparaît dans aucune transaction de vente.");
 
         const saleIds = gamesInSales.map(game_sale => game_sale.id_sale);
 
@@ -46,7 +46,7 @@ export class SaleService {
             },
         });
 
-        if (!sales) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!sales.length) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
 
         const saleIds = sales.map(sale => sale.id_sale);
 
@@ -71,7 +71,7 @@ export class SaleService {
             },
         });
 
-        if (!sales) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!sales.length) throw new NotFoundException("Aucune vente pour cette session.");
 
         const saleIds = sales.map(sale => sale.id_sale);
 
@@ -96,7 +96,7 @@ export class SaleService {
             },
         });
 
-        if (!sales) throw new NotFoundException("Ce client n'apparaît dans aucune transaction de vente.");
+        if (!sales.length) throw new NotFoundException("Ce vendeur n'apparaît dans aucune transaction de vente.");
 
         const saleIds = sales.map(sale => sale.id_sale);
 
@@ -140,7 +140,7 @@ export class SaleService {
 
     async getAll() {
         const sales = await this.prismaService.saleTransaction.findMany();
-        if(!sales) throw new NotFoundException("Il n'y a aucune vente.");
+        if(!sales.length) throw new NotFoundException("Il n'y a aucune vente.");
         return sales;
     }
 

@@ -6,7 +6,7 @@ import { Request } from 'express';
 import { CreateDepositDto } from './dto/createDepositDto';
 import { UpdateDepositDto } from './dto/updateDepositDto';
 
-@Controller('deposit')
+@Controller('deposits')
 export class DepositController {
     constructor(private readonly depositService : DepositService) {}
 
@@ -49,7 +49,7 @@ export class DepositController {
 
     @UseGuards(ManagerGuard)
     @Put('/update/:id_deposit')
-    update(@Param('id_deposit') id_deposit : string, updateDepositDto : UpdateDepositDto) {
+    update(@Param('id_deposit') id_deposit : string, @Body() updateDepositDto : UpdateDepositDto) {
         return this.depositService.update(id_deposit, updateDepositDto);
     }
 

@@ -1,27 +1,21 @@
 import { Type } from "class-transformer";
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 
-type GamesDeposited = {
-    id_game : number;
-    quantity : number;
-    price : number;
-    nb_for_sale : number;
-}
-export class CreateDepositDto {
+// on peut modifier les attributs du recover
+// mais les jeux deposés sont déjà supprimés 
+// donc pas de modif à ce niveau
+export class UpdateRecoverDto {
     @IsOptional()
     @IsDate()
     @Type(() => Date)
     readonly date : Date;
+    @IsOptional()
     @IsNotEmpty()
     amount : number;
-    @IsNotEmpty()
-    fees : number;
-    @IsNotEmpty()
-    discount : number;
+    @IsOptional()
     @IsNotEmpty()
     id_seller : string;
+    @IsOptional()
     @IsNotEmpty()
     id_session : number;
-    @IsNotEmpty()
-    games_deposited : GamesDeposited[];
 }
