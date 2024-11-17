@@ -77,6 +77,9 @@ describe('GameEditorService', () => {
   describe('update', () => {
     it('should update a game editor', async () => {
       const updateGameEditorDto = createGameEditorMock;
+      jest.spyOn(prismaService.gameEditor, 'findUnique')
+        .mockResolvedValueOnce(gameEditorMock) // Mock existing editor
+        .mockResolvedValueOnce(null); // Mock no conflict on name
       const result = await service.update(1, updateGameEditorDto);
       expect(result).toEqual({data: 'Éditeur de jeu modifié avec succès !'});
       expect(prismaService.gameEditor.update).toHaveBeenCalledWith({
@@ -89,6 +92,12 @@ describe('GameEditorService', () => {
       jest.spyOn(prismaService.gameEditor, 'findUnique').mockResolvedValue(null);
       const updateGameEditorDto = createGameEditorMock;
       await expect(service.update(1, updateGameEditorDto)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ConflictException if game editor already exists', async () => {
+      jest.spyOn(prismaService.gameEditor, 'findUnique').mockResolvedValue(gameEditorMock);
+      const updateGameEditorDto = createGameEditorMock;
+      await expect(service.update(1, updateGameEditorDto)).rejects.toThrow(ConflictException);
     });
   });
 

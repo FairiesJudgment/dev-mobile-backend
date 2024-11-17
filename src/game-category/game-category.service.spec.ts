@@ -77,18 +77,25 @@ describe('GameCategoryService', () => {
   describe('update', () => {
     it('should update a game category', async () => {
       const updateGameCategoryDto = createGameCategoryMock;
+      jest.spyOn(prismaService.gameCategory, 'findUnique').mockResolvedValueOnce(gameCategoryMock); // Mock existing category
+      jest.spyOn(prismaService.gameCategory, 'findUnique').mockResolvedValueOnce(null); // Mock no conflict on name
       const result = await service.update(1, updateGameCategoryDto);
-      expect(result).toEqual({data: 'Catégorie de jeu modifiée avec succès !'});
+      expect(result).toEqual({ data: 'Catégorie de jeu modifiée avec succès !' });
       expect(prismaService.gameCategory.update).toHaveBeenCalledWith({
-        where: { id_category: 1 },
-        data: updateGameCategoryDto,
-      });
+      where: { id_category: 1 },
+      data: updateGameCategoryDto,
     });
+  });
 
     it('should throw NotFoundException if game category not found', async () => {
       jest.spyOn(prismaService.gameCategory, 'findUnique').mockResolvedValue(null);
       const updateGameCategoryDto = createGameCategoryMock;
       await expect(service.update(1, updateGameCategoryDto)).rejects.toThrow(NotFoundException);
+    });
+    it('should throw ConflictException if game category name already exists', async () => {
+      jest.spyOn(prismaService.gameCategory, 'findUnique').mockResolvedValue({ id_category: 2, name: 'Existing Category', description: 'Description' });
+      const updateGameCategoryDto = { ...createGameCategoryMock, name: 'Existing Category' };
+      await expect(service.update(1, updateGameCategoryDto)).rejects.toThrow(ConflictException);
     });
   });
 

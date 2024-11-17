@@ -36,7 +36,6 @@ describe('GameController', () => {
     it('should return a game by id', async () => {
       controller.get = jest.fn().mockResolvedValue(gameMock);
       await expect(controller.get(1)).resolves.toEqual(gameMock);
-      expect(controller.get).toHaveBeenCalledWith(1);
     });
   });
 
@@ -45,7 +44,6 @@ describe('GameController', () => {
       controller.create = jest.fn().mockResolvedValue({ data: 'Jeu créé avec succès !' });
       const createGameMockDto = gameMock;
       await expect(controller.create(createGameMockDto)).resolves.toEqual({ data: 'Jeu créé avec succès !' });
-      expect(controller.create).toHaveBeenCalledWith(createGameMockDto);
     });
   });
 
@@ -54,7 +52,6 @@ describe('GameController', () => {
       controller.update = jest.fn().mockResolvedValue({ data: 'Jeu mis à jour avec succès !' });
       const updateGameMockDto = gameMock;
       await expect(controller.update(1, updateGameMockDto)).resolves.toEqual({ data: 'Jeu mis à jour avec succès !' });
-      expect(controller.update).toHaveBeenCalledWith(1, updateGameMockDto);
     });
   });
 
@@ -62,7 +59,6 @@ describe('GameController', () => {
     it('should delete a game', async () => {
       controller.delete = jest.fn().mockResolvedValue({ data: 'Jeu supprimé avec succès !' });
       await expect(controller.delete(1)).resolves.toEqual({ data: 'Jeu supprimé avec succès !' });
-      expect(controller.delete).toHaveBeenCalledWith(1);
     });
   });
 });

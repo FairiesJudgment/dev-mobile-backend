@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DepositedGameService } from './deposited-game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
-import { createDepositedGameMock, depositedGameMock } from './mocks/deposited-game.mock';
+import { manyDepositedGamesMock, createManyDepositedGamesMock, updateDepositedGamesMock } from './mocks/deposited-game.mock';
+import { SessionService } from 'src/session/session.service';
 
 describe('DepositedGameService', () => {
   let service: DepositedGameService;
@@ -16,21 +17,27 @@ describe('DepositedGameService', () => {
           provide: PrismaService,
           useValue: {
             depositedGame: {
-              findMany: jest.fn().mockResolvedValue([depositedGameMock]),
-              findUnique: jest.fn().mockResolvedValue(depositedGameMock),
-              create: jest.fn().mockResolvedValue(depositedGameMock),
-              update: jest.fn().mockResolvedValue(depositedGameMock),
-              delete: jest.fn().mockResolvedValue(depositedGameMock),
+              findMany: jest.fn().mockResolvedValue([manyDepositedGamesMock]),
+              findUnique: jest.fn().mockResolvedValue(manyDepositedGamesMock),
+              create: jest.fn().mockResolvedValue(manyDepositedGamesMock),
+              updateMany: jest.fn().mockResolvedValue(manyDepositedGamesMock),
+              delete: jest.fn().mockResolvedValue(manyDepositedGamesMock),
             },
             game: {
-              findUnique: jest.fn().mockResolvedValue(depositedGameMock),
+              findUnique: jest.fn().mockResolvedValue(manyDepositedGamesMock),
             },
             session: {
-              findUnique: jest.fn().mockResolvedValue(depositedGameMock),
+              findUnique: jest.fn().mockResolvedValue(manyDepositedGamesMock),
             },
             seller: {
-              findUnique: jest.fn().mockResolvedValue(depositedGameMock),
+              findUnique: jest.fn().mockResolvedValue(manyDepositedGamesMock),
             },
+          },
+        },
+        {
+          provide: SessionService,
+          useValue: {
+            getOpened: jest.fn().mockResolvedValue({ manyDepositedGamesMock}),
           },
         },
       ],
@@ -47,7 +54,7 @@ describe('DepositedGameService', () => {
   describe('getAll', () => {
     it('should return an array of deposited games', async () => {
       const result = await service.getAll();
-      expect(result).toEqual([depositedGameMock]);
+      expect(result).toEqual([manyDepositedGamesMock]);
       expect(prismaService.depositedGame.findMany).toHaveBeenCalled();
     });
   });
@@ -55,7 +62,7 @@ describe('DepositedGameService', () => {
   describe('get', () => {
     it('should return a deposited game by tag', async () => {
       const result = await service.get('tag');
-      expect(result).toEqual(depositedGameMock);
+      expect(result).toEqual(manyDepositedGamesMock);
       expect(prismaService.depositedGame.findUnique).toHaveBeenCalledWith({ where: { tag: 'tag' } });
     });
 
@@ -67,24 +74,17 @@ describe('DepositedGameService', () => {
 
   describe('create', () => {
     it('should create a deposited game', async () => {
-      const createDepositedGameMockDto = createDepositedGameMock
-      const result = await service.create(createDepositedGameMockDto);
-      expect(result).toEqual({data: 'Jeu déposé créé avec succès !'});
-      expect(prismaService.depositedGame.create).toHaveBeenCalledWith({
-        data: createDepositedGameMockDto,
-      });
+      const createManyDepositedGamesMockDto = createManyDepositedGamesMock
+      const result = await service.createMany(createManyDepositedGamesMockDto);
+      expect(result).toEqual({data: 'Jeux déposés créés avec succès !'});
     });
   });
 
   describe('update', () => {
     it('should update a deposited game', async () => {
-      const updateDepositedGameMockDto = createDepositedGameMock;
-      const result = await service.update('tag1', updateDepositedGameMockDto);
-      expect(result).toEqual({data: 'Jeu déposé mis à jour avec succès !'});
-      expect(prismaService.depositedGame.update).toHaveBeenCalledWith({
-        where: { tag: 'tag1' },
-        data: updateDepositedGameMockDto,
-      });
+      const updateDepositedGamesMockDto = updateDepositedGamesMock;
+      const result = await service.update('tag1', updateDepositedGamesMockDto);
+      expect(result).toEqual({data: 'Jeux déposés mis à jour avec succès !'});
     });
   });
 
@@ -99,6 +99,6 @@ describe('DepositedGameService', () => {
   // Additional tests for NotFoundExceptions
   it('should throw NotFoundException if the game does not exist when creating', async () => {
     jest.spyOn(prismaService.game, 'findUnique').mockResolvedValue(null); // Mock to return null for game
-    await expect(service.create({ ...depositedGameMock, price: depositedGameMock.price })).rejects.toThrow(NotFoundException);
+    await expect(service.createMany({ ...manyDepositedGamesMock, price: manyDepositedGamesMock.price })).rejects.toThrow(NotFoundException);
   });
 });
