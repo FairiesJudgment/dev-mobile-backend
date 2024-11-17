@@ -41,6 +41,7 @@ export class SellerController {
         return this.sellerService.create(createSellerDto);
     }
 
+    @UseGuards(ManagerGuard)
     @Put('/update/:id')
     update(@Param('id') id_seller : string, @Body() updateSellerDto : UpdateSellerDto, @Req() request : Request) {
         const asker_id = request.user['id_manager'] ? request.user['id_manager'] : request.user['id_seller'];

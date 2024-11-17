@@ -6,10 +6,11 @@ import { ManagerService } from "src/manager/manager.service";
 import { ManagerGuard } from "src/common/guards/manager.guard";
 import { JwtService } from "@nestjs/jwt";
 import { DepositedGameService } from "./deposited-game.service";
-import { depositedGameMock } from "./mocks/deposited-game.mock";
+import { manyDepositedGamesMock, createManyDepositedGamesMock } from "./mocks/deposited-game.mock";
 
 describe('DepositedGameController', () => {
   let controller: DepositedGameController;
+  let service: DepositedGameService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,63 +22,64 @@ describe('DepositedGameController', () => {
                   {provide: ConfigService, useValue: {get: jest.fn(),},},
       ],
     }).compile();
-    controller = module.get<DepositedGameController>(DepositedGameController)
+    controller = module.get<DepositedGameController>(DepositedGameController),
+    service = module.get<DepositedGameService>(DepositedGameService);
   });
 
   describe("getAll", ()=> {
     it("should return an array of despositedGame", () => {
-      controller.getAll = jest.fn().mockResolvedValue([depositedGameMock]);
-      expect(controller.getAll()).resolves.toEqual([depositedGameMock])
+      controller.getAll = jest.fn().mockResolvedValue([manyDepositedGamesMock]);
+      expect(controller.getAll()).resolves.toEqual([manyDepositedGamesMock])
     })
   })
 
   describe('get', () => {
     it('should return a deposited game by tag', async () => {
-      controller.get = jest.fn().mockResolvedValue(depositedGameMock);
-      await expect(controller.get('tag')).resolves.toEqual(depositedGameMock);
+      controller.get = jest.fn().mockResolvedValue(manyDepositedGamesMock);
+      await expect(controller.get('tag')).resolves.toEqual(manyDepositedGamesMock);
       expect(controller.get).toHaveBeenCalledWith('tag');
     });
   });
 
   describe('getByGame', () => {
     it('should return deposited games by game ID', async () => {
-      controller.getByGame = jest.fn().mockResolvedValue(depositedGameMock);
-      await expect(controller.getByGame(1)).resolves.toEqual(depositedGameMock);
+      controller.getByGame = jest.fn().mockResolvedValue(manyDepositedGamesMock);
+      await expect(controller.getByGame(1)).resolves.toEqual(manyDepositedGamesMock);
       expect(controller.getByGame).toHaveBeenCalledWith(1);
     });
   });
 
   describe('getBySession', () => {
     it('should return deposited games by session ID', async () => {
-      controller.getBySession = jest.fn().mockResolvedValue(depositedGameMock);
-      await expect(controller.getBySession(1)).resolves.toEqual(depositedGameMock);
+      controller.getBySession = jest.fn().mockResolvedValue(manyDepositedGamesMock);
+      await expect(controller.getBySession(1)).resolves.toEqual(manyDepositedGamesMock);
       expect(controller.getBySession).toHaveBeenCalledWith(1);
     });
   });
 
   describe('getBySeller', () => {
     it('should return deposited games by seller ID', async () => {
-      controller.getBySeller = jest.fn().mockResolvedValue(depositedGameMock);
-      await expect(controller.getBySeller('123e4567-e89b-12d3-a456-426614174000')).resolves.toEqual(depositedGameMock);
+      controller.getBySeller = jest.fn().mockResolvedValue(manyDepositedGamesMock);
+      await expect(controller.getBySeller('123e4567-e89b-12d3-a456-426614174000')).resolves.toEqual(manyDepositedGamesMock);
       expect(controller.getBySeller).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
     });
   });
 
-  describe('create', () => {
-    it('should create a deposited game', async () => {
-      controller.create = jest.fn().mockResolvedValue({ data: 'Jeu déposé créé avec succès !' });
-      const depositedGameMockDto = depositedGameMock;
-      await expect(controller.create(depositedGameMockDto)).resolves.toEqual({ data: 'Jeu déposé créé avec succès !' });
-      expect(controller.create).toHaveBeenCalledWith(depositedGameMockDto);
+  describe('createMany', () => {
+    it('should create deposited games', async () => {
+      const createManyDepositedGameDto = createManyDepositedGamesMock;
+      controller.createMany = jest.fn().mockResolvedValue({ data: 'Jeux déposés créés avec succès !' });
+      const result = await controller.createMany(createManyDepositedGameDto);
+      expect(result).toEqual({ data: 'Jeux déposés créés avec succès !' });
     });
   });
 
   describe('update', () => {
     it('should update a deposited game', async () => {
       controller.update = jest.fn().mockResolvedValue({ data: 'Jeu déposé mis à jour avec succès !' });
-      const DepositedGameMockDto = depositedGameMock
-      await expect(controller.update('tag', DepositedGameMockDto)).resolves.toEqual({ data: 'Jeu déposé mis à jour avec succès !' });
-      expect(controller.update).toHaveBeenCalledWith('tag', DepositedGameMockDto);
+      const manyDepositedGamesMockDto = manyDepositedGamesMock
+      await expect(controller.update('tag', manyDepositedGamesMockDto)).resolves.toEqual({ data: 'Jeu déposé mis à jour avec succès !' });
+      expect(controller.update).toHaveBeenCalledWith('tag', manyDepositedGamesMockDto);
     });
   });
 

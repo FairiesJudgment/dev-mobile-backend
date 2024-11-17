@@ -209,7 +209,7 @@ export class DepositedGameService {
             }
         });
         // retourner message de succès
-        return { data: 'Jeu déposé mis à jour avec succès !' };
+        return { data: 'Jeux déposés mis à jour avec succès !' };
     }
 
     // supprimer un jeu déposé

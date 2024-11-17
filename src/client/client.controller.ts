@@ -29,7 +29,6 @@ export class ClientController {
     @UseGuards(ManagerGuard)
     @Put('update/:id')
     update(@Param('id', ParseIntPipe) id_client : number, @Body() updateClientDto : UpdateClientDto) {
-        console.log(id_client)
         return this.clientService.update(id_client, updateClientDto);
     }
 

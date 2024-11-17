@@ -96,6 +96,14 @@ export class ManagerService {
       if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
     }
 
+    // vérifier si le téléphone n'est pas déjà utilisé
+    if (phone) {
+      const manager = await this.prismaService.manager.findUnique({where: { phone: phone },});
+      if (manager) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
+      const seller = await this.prismaService.seller.findUnique({where: { phone: phone },});
+      if (seller) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
+    }
+
     //hasher mot de passe
     const salt = uuid();
     const hash = await bcrypt.hash(password + salt, 10);
@@ -161,6 +169,14 @@ export class ManagerService {
       if (manager) throw new ConflictException("Ce pseudo est déjà utilisé.");
       const seller = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username },});
       if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
+    }
+
+    // verifier si le téléphone n'est pas déjà utilisé
+    if (updateManagerDto.phone) {
+      const manager = await this.prismaService.manager.findUnique({where: { phone: updateManagerDto.phone },});
+      if (manager) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
+      const seller = await this.prismaService.seller.findUnique({where: { phone: updateManagerDto.phone },});
+      if (seller) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
     }
     // appliquer modifications
     await this.prismaService.manager.update({

@@ -8,10 +8,11 @@ export class CreateClientDto {
     @IsNotEmpty()
     lastname : string;
     @CustomIsEmail()
+    @IsNotEmpty()
     email : string;
     @CustomIsPhoneNumber()
+    @IsNotEmpty()
     phone : string;
     @IsOptional()
-    @IsNotEmpty()
     address : string;
 }
