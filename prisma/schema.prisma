@@ -83,6 +83,7 @@ model Game {
   max_age     Int
   id_editor   Int
   id_category Int
+  image String?
   editor      GameEditor   @relation("editor_games", fields: [id_editor], references: [id_editor], onUpdate: Cascade, onDelete: Cascade)
   category    GameCategory @relation("category_games", fields: [id_category], references: [id_category], onUpdate: Cascade, onDelete: Cascade)
   copies DepositedGame[] @relation("game_copies")
