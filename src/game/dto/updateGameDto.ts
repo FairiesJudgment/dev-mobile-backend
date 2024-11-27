@@ -11,6 +11,10 @@ export class UpdateGameDto {
     description?: string;
 
     @IsOptional()
+    @IsString()
+    image: string;
+
+    @IsOptional()
     @IsInt()
     @Min(1)
     min_players?: number;

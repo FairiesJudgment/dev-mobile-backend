@@ -42,6 +42,7 @@ export class GameService {
             min_age,
             max_age,
             id_editor,
+            image,
             id_category 
         } = createGameDto;
 
@@ -75,6 +76,7 @@ export class GameService {
                 max_players,
                 min_age,
                 max_age,
+                image,
                 id_editor : id_editor,
                 id_category : id_category
             }
@@ -88,6 +90,7 @@ export class GameService {
         const {
             name,
             description,
+            image,
             min_players,
             max_players,
             min_age,
@@ -133,6 +136,7 @@ export class GameService {
             data: {
                 name,
                 description,
+                image,
                 min_players,
                 max_players,
                 min_age,

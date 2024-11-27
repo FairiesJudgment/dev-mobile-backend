@@ -10,6 +10,10 @@ export class CreateGameDto {
     @IsString()
     description: string;
 
+    @IsNotEmpty()
+    @IsString()
+    image: string;
+
     @IsInt()
     @Min(1)
     min_players: number;
