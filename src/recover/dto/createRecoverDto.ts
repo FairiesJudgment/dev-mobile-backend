@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 
 type GamesRecovered = {
     id_game : number;
@@ -7,6 +7,7 @@ type GamesRecovered = {
 }
 
 export class CreateRecoverDto {
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
     readonly date : Date;

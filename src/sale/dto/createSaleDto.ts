@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 import { PaymentMethod } from '@prisma/client'
 
 type GameSold = {
@@ -8,6 +8,7 @@ type GameSold = {
     quantity : number;
 }
 export class CreateSaleDto {
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
     readonly date : Date;
