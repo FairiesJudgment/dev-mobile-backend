@@ -156,28 +156,24 @@ export class ManagerService {
         throw new UnauthorizedException('Opération interdite');
     }
     // verifier si l'email n'est pas déjà utilisé
-    if (updateManagerDto.email) {
-      const manager = await this.findManager({ email: updateManagerDto.email });
-      if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
-      const seller = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email },});
-      if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
-    }
+    const managerEmail = await this.prismaService.manager.findUnique({where: { email: updateManagerDto.email, NOT: { id_manager: id_manager } },});
+    if (managerEmail) throw new ConflictException("Cet email est déjà utilisé par un manager.");
+    const sellerEmail = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email, NOT: { id_seller: id_manager } },});
+    if (sellerEmail) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+    
 
     // verifier si le pseudo n'est pas déjà utilisé
-    if (updateManagerDto.username) {
-      const manager = await this.findManager({ username: updateManagerDto.username });
-      if (manager) throw new ConflictException("Ce pseudo est déjà utilisé.");
-      const seller = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username },});
-      if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
-    }
+    const managerUsername = await this.prismaService.manager.findUnique({where: { username: updateManagerDto.username, NOT: { id_manager: id_manager } },});
+    if (managerUsername) throw new ConflictException("Ce pseudo est déjà utilisé.");
+    const sellerUsername = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username, NOT: { id_seller: id_manager } },});
+    if (sellerUsername) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
 
     // verifier si le téléphone n'est pas déjà utilisé
-    if (updateManagerDto.phone) {
-      const manager = await this.prismaService.manager.findUnique({where: { phone: updateManagerDto.phone },});
-      if (manager) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
-      const seller = await this.prismaService.seller.findUnique({where: { phone: updateManagerDto.phone },});
-      if (seller) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
-    }
+    const managerPhone = await this.prismaService.manager.findUnique({where: { phone: updateManagerDto.phone, NOT: { id_manager: id_manager } },});
+    if (managerPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
+    const sellerPhone = await this.prismaService.seller.findUnique({where: { phone: updateManagerDto.phone, NOT: { id_seller: id_manager } },});
+    if (sellerPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
+    
     // appliquer modifications
     await this.prismaService.manager.update({
       where: {
