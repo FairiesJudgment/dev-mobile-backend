@@ -57,7 +57,7 @@ export class ManagerController {
 
     @UseGuards(ManagerGuard)
     @Delete()
-    deleteMany(@Body('ids') ids: string[]) {
+    deleteMany(@Body() ids: string[]) {
         return this.managerService.deleteMany(ids);
     }
 }

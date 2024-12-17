@@ -40,7 +40,7 @@ export class ClientController {
     
     @UseGuards(ManagerGuard)
     @Delete()
-    deleteMany(@Body('ids') ids: number[]) {
+    deleteMany(@Body() ids: number[]) {
         return this.clientService.deleteMany(ids);
     }
 }

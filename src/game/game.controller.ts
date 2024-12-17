@@ -48,7 +48,7 @@ export class GameController {
 
     @UseGuards(ManagerGuard)
     @Delete()
-    deleteMany(@Body('ids') ids: number[]) {
+    deleteMany(@Body() ids: number[]) {
         return this.gameService.deleteMany(ids);
     }
 }

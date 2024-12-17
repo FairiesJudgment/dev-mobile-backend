@@ -42,7 +42,7 @@ export class GameCategoryController {
 
     @UseGuards(ManagerGuard)
     @Delete()
-    deleteMany(@Body('ids') ids: number[]) {
+    deleteMany(@Body() ids: number[]) {
         return this.gameCategoryService.deleteMany(ids);
     }
 }
