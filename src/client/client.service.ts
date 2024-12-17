@@ -70,15 +70,12 @@ export class ClientService {
 
     async update(id_client: number, updateClientDto: UpdateClientDto) {
         // Verifier si l'email existe déjà
-        if (updateClientDto.email) {
-            const client = await this.findClient({ email: updateClientDto.email });
-            if (client) throw new ConflictException("Cet email est déjà utilisé.");
-        }
+        const clientEmail = await this.prismaService.client.findUnique({where : {email : updateClientDto.email, NOT : {id_client : id_client}}});
+        if (clientEmail) throw new ConflictException("Cet email est déjà utilisé.");
+
         // Verifier si le numéro de téléphone existe déjà
-        if (updateClientDto.phone) {
-            const clientPhone = await this.findClient({ phone: updateClientDto.phone });
-            if (clientPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé.");
-        }
+        const clientPhone = await this.prismaService.client.findUnique({where : {phone : updateClientDto.phone, NOT : {id_client : id_client}}});
+        if (clientPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé.");
 
         // mettre à jour le client
         await this.prismaService.client.update({
