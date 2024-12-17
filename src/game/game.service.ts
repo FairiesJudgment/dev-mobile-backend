@@ -160,4 +160,19 @@ export class GameService {
         // retourner message de succès
         return { data: 'Jeu supprimé avec succès !' };
     }
+
+    // supprimer plusieurs jeux
+    async deleteMany(ids: number[]) {
+        // verifier que ids est fourni
+        if (ids == undefined) { throw new NotFoundException("Vous devez fournir une liste d'ids de jeux.");}
+        // vérifier si les jeux existent
+        for (let id of ids) {
+            const game = await this.prismaService.game.findUnique({where: { id_game: id },});
+            if (!game) { throw new NotFoundException("Le jeu avec l'id " + id + " n'existe pas.");}
+        }
+        // supprimer les jeux en BD
+        await this.prismaService.game.deleteMany({where: { id_game: { in: ids }},});
+        // retourner message de succès
+        return { data: 'Jeux supprimés avec succès !' };
+    }
 }

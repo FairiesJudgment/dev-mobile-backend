@@ -26,10 +26,12 @@ export class ClientService {
     return client;
     }
 
+    // récupérer tous les clients
     async getAll() {
         return await this.prismaService.client.findMany();
     }
 
+    // récupérer un client selon son id
     async get(id_client: number) {
         // vérifier si client existe
         const client = await this.findClient({id_client : id_client});
@@ -39,6 +41,7 @@ export class ClientService {
         return client;
     }
 
+    // créer un client
     async create(createClientDto: CreateClientDto) {
         const {
             firstname,
@@ -68,6 +71,7 @@ export class ClientService {
         return { data: 'Client créé avec succès !' };
     }
 
+    // modifier un client
     async update(id_client: number, updateClientDto: UpdateClientDto) {
         // Verifier si l'email existe déjà
         const clientEmail = await this.prismaService.client.findUnique({where : {email : updateClientDto.email, NOT : {id_client : id_client}}});
@@ -90,6 +94,7 @@ export class ClientService {
         return { data : 'Client mis à jour !'};
     }
 
+    // supprimer un client
     async delete(id_client: number) {
         // verifier que le client existe 
         const client = await this.findClient({ id_client : id_client });
@@ -103,5 +108,24 @@ export class ClientService {
         });
 
         return { data : 'Client supprimé !'};
+    }
+
+    // supprimer plusieurs clients
+    async deleteMany(ids: number[]) {
+        // verifier que ids est fourni
+        if (ids == undefined) throw new NotFoundException("Vous devez fournir une liste d'ids de clients.");
+        // verifier que les clients existent
+        for (let id of ids) {
+            const client = await this.findClient({ id_client : id });
+            if (!client) throw new NotFoundException("Le client avec l'id " + id + " n'existe pas.");
+        }
+        // supprimer les clients dans la base de données
+        await this.prismaService.client.deleteMany({
+            where : {
+                id_client : {
+                    in : ids,
+                },
+            },
+        });
     }
 }

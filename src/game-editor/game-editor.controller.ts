@@ -39,4 +39,10 @@ export class GameEditorController {
     delete(@Param('id_editor') id_editor: number) {
         return this.gameEditorService.delete(id_editor);
     }
+
+    @UseGuards(ManagerGuard)
+    @Delete()
+    deleteMany(@Body('ids') ids: number[]) {
+        return this.gameEditorService.deleteMany(ids);
+    }
 }

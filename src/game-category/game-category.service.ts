@@ -84,4 +84,19 @@ export class GameCategoryService {
         // retourner message de succès
         return { data: 'Catégorie de jeu supprimée avec succès !' };
     }
+
+    // supprimer plusieurs catégories de jeux
+    async deleteMany(ids: number[]) {
+        // vérifier que ids est fourni
+        if (ids == undefined) { throw new NotFoundException("Vous devez fournir une liste d'ids de catégories de jeux.");}
+        // vérifier si les catégories existent
+        for (let id of ids) {
+            const gameCategory = await this.prismaService.gameCategory.findUnique({where: { id_category: id }});
+            if (!gameCategory) { throw new NotFoundException("La catégorie de jeu avec l'id " + id + " n'existe pas.");}
+        }
+        // supprimer les catégories en BD
+        await this.prismaService.gameCategory.deleteMany({where: { id_category: { in: ids }}});
+        // retourner message de succès
+        return { data: 'Catégories de jeu supprimées avec succès !' };
+    }
 }

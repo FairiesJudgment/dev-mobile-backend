@@ -43,10 +43,12 @@ export class ManagerService {
     return await bcrypt.compare(password + password_salt, hash);
   }
 
+  // récupérer tous les managers
   async getAll() {
     return await this.prismaService.manager.findMany();
   }
 
+  // récupérer un manager selon son pseudo
   async get(username: string, asker_id: any) {
     // vérifier si le manager existe
     const manager = await this.findManager({ username: username });
@@ -127,6 +129,7 @@ export class ManagerService {
     return { data: 'Manager créé avec succès !' };
   }
 
+  // supprimer un manager
   async delete(id_manager: string) {
     // verifier que le manager existe
     const manager = await this.findManager({ id_manager: id_manager });
@@ -139,6 +142,7 @@ export class ManagerService {
     return { data: 'Manager supprimé !' };
   }
 
+  // modifier un manager
   async update(
     id_manager: string,
     updateManagerDto: UpdateManagerDto,
@@ -184,5 +188,26 @@ export class ManagerService {
       },
     });
     return { data: 'Manager mis à jour !' };
+  }
+
+  // supprimer plusieurs managers
+  async deleteMany(ids: string[]) {
+    // verifier que ids est fourni
+    if (ids == undefined)
+      throw new NotFoundException("Vous devez fournir une liste d'ids de managers.");
+    // verifier que les managers existent
+    for (let id of ids) {
+      const manager = await this.findManager({ id_manager: id });
+      if (!manager) throw new NotFoundException("Le manager avec l'id " + id + " n'existe pas.");
+    }
+    // supprimer les managers dans la base de données
+    await this.prismaService.manager.deleteMany({
+      where: {
+        id_manager: {
+          in: ids,
+        },
+      },
+    });
+    return { data: 'Managers supprimés !' };
   }
 }

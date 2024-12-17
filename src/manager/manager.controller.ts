@@ -54,4 +54,10 @@ export class ManagerController {
         const asker_id = request.user['id_manager'];
         return this.managerService.update(id_manager, updateManagerDto, asker_id);
     }
+
+    @UseGuards(ManagerGuard)
+    @Delete()
+    deleteMany(@Body('ids') ids: string[]) {
+        return this.managerService.deleteMany(ids);
+    }
 }

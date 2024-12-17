@@ -39,4 +39,10 @@ export class GameCategoryController {
     delete(@Param('id_category') id_category: number) {
         return this.gameCategoryService.delete(id_category);
     }
+
+    @UseGuards(ManagerGuard)
+    @Delete()
+    deleteMany(@Body('ids') ids: number[]) {
+        return this.gameCategoryService.deleteMany(ids);
+    }
 }

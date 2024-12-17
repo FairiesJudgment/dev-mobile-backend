@@ -32,10 +32,12 @@ export class SellerService {
         return await bcrypt.compare(password + password_salt, hash);
     }
 
+    // récupérer tous les vendeurs
     async getAll() {
         return await this.prismaService.seller.findMany();
     }
 
+    // récupérer un vendeur selon son username
     async get(username: string, asker_id: string) {
         const seller = await this.findSeller({username : username});
         if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
@@ -56,6 +58,7 @@ export class SellerService {
         }
     }
 
+    // créer un vendeur
     async create(createSellerDto: CreateSellerDto) {
         const { username, email, password, firstname, lastname, phone, address } =
         createSellerDto;
@@ -105,6 +108,7 @@ export class SellerService {
         return { data : 'Vendeur créé avec succès !' };
     }
 
+    // modifier un vendeur
     async update (id_seller: string, updateSellerDto: UpdateSellerDto, asker_id: any) {
         // verifier que seller existe
         const seller = await this.findSeller({id_seller : id_seller});
@@ -146,6 +150,7 @@ export class SellerService {
         return { data : 'Vendeur mis à jour !' };
     }
 
+    // supprimer un vendeur
     async delete(id_seller: string) {
         // vérifier que le seller existe
         const seller = await this.findSeller({id_seller : id_seller});
@@ -156,5 +161,25 @@ export class SellerService {
             },
         });
         return { data : 'Vendeur supprimé !' };
+    }
+
+    // supprimer plusieurs vendeurs
+    async deleteMany(ids: string[]) {
+        // verifier que ids est fourni
+        if (ids == undefined) throw new NotFoundException("Vous devez fournir une liste d'ids de vendeurs.");
+        // vérifier que les sellers existent
+        for (let id of ids) {
+            const seller = await this.findSeller({id_seller : id});
+            if (!seller) throw new NotFoundException("Le vendeur avec l'id " + id + " n'existe pas.");
+        }
+        // supprimer les sellers dans la base de données
+        await this.prismaService.seller.deleteMany({
+            where : {
+                id_seller : {
+                    in : ids,
+                },
+            },
+        });
+        return { data : 'Vendeurs supprimés !' };
     }
 }
