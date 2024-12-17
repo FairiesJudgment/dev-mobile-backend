@@ -25,6 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: Payload) {
+    console.log(payload);
     // verifier si le token appartient à un manager
     const manager = await this.managerService.findManager({email : payload.email});
     // si on a trouvé un manager correpondant

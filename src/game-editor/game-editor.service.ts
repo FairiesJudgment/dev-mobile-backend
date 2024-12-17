@@ -81,4 +81,19 @@ export class GameEditorService {
         // retourner message de succès
         return { data: 'Éditeur de jeu supprimé avec succès !' };
     }
+
+    // supprimer plusieurs éditeurs de jeux
+    async deleteMany(ids: number[]) {
+        // verifier que ids est fourni
+        if (ids == undefined) { throw new NotFoundException("Vous devez fournir une liste d'ids d'éditeurs.");}
+        // vérifier si les éditeurs existent
+        for (let id of ids) {
+            const gameEditor = await this.prismaService.gameEditor.findUnique({where: { id_editor: id },});
+            if (!gameEditor) { throw new NotFoundException("L'éditeur avec l'id " + id + " n'existe pas.");}
+        }
+        // supprimer les éditeurs en BD
+        await this.prismaService.gameEditor.deleteMany({where: { id_editor: { in: ids }},});
+        // retourner message de succès
+        return { data: 'Éditeurs de jeu supprimés avec succès !' };
+    }
 }

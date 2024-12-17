@@ -54,5 +54,9 @@ export class SellerController {
         return this.sellerService.delete(id_seller);
     }
 
-
+    @UseGuards(ManagerGuard)
+    @Delete()
+    deleteMany(@Body() ids: string[]) {
+        return this.sellerService.deleteMany(ids);
+  }
 }

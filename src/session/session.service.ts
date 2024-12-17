@@ -50,6 +50,7 @@ export class SessionService {
         return session;
     }
 
+    // recupere une session selon son id
     async get(id_session: number) {
         const session = await this.findSession({ id_session : id_session });
 
@@ -58,10 +59,12 @@ export class SessionService {
         return session;
     }
 
+    // recupere toutes les sessions
     async getAll() {
         return await this.prismaService.session.findMany();
     }
 
+    // crée une nouvelle session
     async create(createSessionDto: CreateSessionDto) {
         const {date_begin, date_end} = createSessionDto;
         // verifier qu'aucune session n'a la même nom
@@ -81,6 +84,7 @@ export class SessionService {
         return {data : "Session créée avec succès !"};
     }
 
+    // met à jour une session
     async update(updateSessionDto: UpdateSessionDto, id_session: number) {
         // verifier que la session exsite
         const session = await this.findSession({ id_session : id_session} );
@@ -125,6 +129,7 @@ export class SessionService {
         return { data : 'Session modifiée avec succès !' };
     }
 
+    // supprime une session
     async delete(id_session: number) {
         // verifier que la session exsite
         const session = await this.findSession({ id_session : id_session });
@@ -135,5 +140,25 @@ export class SessionService {
         });
 
         return { data : 'Session supprimée avec succès !'};
+    }
+
+    // supprime plusieurs sessions
+    async deleteMany(ids: number[]) {
+        // verifier que ids est fourni
+        if (ids == undefined) throw new NotFoundException("Vous devez fournir une liste d'ids de sessions.");
+        // verifier que les sessions existent
+        for (let id of ids) {
+            const session = await this.findSession({ id_session : id });
+            if (!session) throw new NotFoundException("La session avec l'id " + id + " n'existe pas.");
+        }
+        // supprimer les sessions dans la base de données
+        await this.prismaService.session.deleteMany({
+            where : {
+                id_session : {
+                    in : ids,
+                },
+            },
+        });
+        return { data : 'Sessions suppimées !'};
     }
 }

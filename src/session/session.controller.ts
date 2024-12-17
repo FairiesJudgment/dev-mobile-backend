@@ -45,4 +45,9 @@ export class SessionController {
         return this.sessionService.delete(id_session);
     }
 
+    @UseGuards(AdminGuard)
+    @Delete()
+    deleteMany(@Body() ids : number[]) {
+        return this.sessionService.deleteMany(ids);
+    }
 }

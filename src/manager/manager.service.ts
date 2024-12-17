@@ -43,10 +43,12 @@ export class ManagerService {
     return await bcrypt.compare(password + password_salt, hash);
   }
 
+  // récupérer tous les managers
   async getAll() {
     return await this.prismaService.manager.findMany();
   }
 
+  // récupérer un manager selon son pseudo
   async get(username: string, asker_id: any) {
     // vérifier si le manager existe
     const manager = await this.findManager({ username: username });
@@ -127,6 +129,7 @@ export class ManagerService {
     return { data: 'Manager créé avec succès !' };
   }
 
+  // supprimer un manager
   async delete(id_manager: string) {
     // verifier que le manager existe
     const manager = await this.findManager({ id_manager: id_manager });
@@ -139,6 +142,7 @@ export class ManagerService {
     return { data: 'Manager supprimé !' };
   }
 
+  // modifier un manager
   async update(
     id_manager: string,
     updateManagerDto: UpdateManagerDto,
@@ -156,28 +160,24 @@ export class ManagerService {
         throw new UnauthorizedException('Opération interdite');
     }
     // verifier si l'email n'est pas déjà utilisé
-    if (updateManagerDto.email) {
-      const manager = await this.findManager({ email: updateManagerDto.email });
-      if (manager) throw new ConflictException("Cet email est déjà utilisé par un manager.");
-      const seller = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email },});
-      if (seller) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
-    }
+    const managerEmail = await this.prismaService.manager.findUnique({where: { email: updateManagerDto.email, NOT: { id_manager: id_manager } },});
+    if (managerEmail) throw new ConflictException("Cet email est déjà utilisé par un manager.");
+    const sellerEmail = await this.prismaService.seller.findUnique({where: { email: updateManagerDto.email, NOT: { id_seller: id_manager } },});
+    if (sellerEmail) throw new ConflictException("Cet email est déjà utilisé par un vendeur.");
+    
 
     // verifier si le pseudo n'est pas déjà utilisé
-    if (updateManagerDto.username) {
-      const manager = await this.findManager({ username: updateManagerDto.username });
-      if (manager) throw new ConflictException("Ce pseudo est déjà utilisé.");
-      const seller = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username },});
-      if (seller) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
-    }
+    const managerUsername = await this.prismaService.manager.findUnique({where: { username: updateManagerDto.username, NOT: { id_manager: id_manager } },});
+    if (managerUsername) throw new ConflictException("Ce pseudo est déjà utilisé.");
+    const sellerUsername = await this.prismaService.seller.findUnique({where: { username: updateManagerDto.username, NOT: { id_seller: id_manager } },});
+    if (sellerUsername) throw new ConflictException("Ce pseudo est déjà utilisé par un vendeur.");
 
     // verifier si le téléphone n'est pas déjà utilisé
-    if (updateManagerDto.phone) {
-      const manager = await this.prismaService.manager.findUnique({where: { phone: updateManagerDto.phone },});
-      if (manager) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
-      const seller = await this.prismaService.seller.findUnique({where: { phone: updateManagerDto.phone },});
-      if (seller) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
-    }
+    const managerPhone = await this.prismaService.manager.findUnique({where: { phone: updateManagerDto.phone, NOT: { id_manager: id_manager } },});
+    if (managerPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un manager.");
+    const sellerPhone = await this.prismaService.seller.findUnique({where: { phone: updateManagerDto.phone, NOT: { id_seller: id_manager } },});
+    if (sellerPhone) throw new ConflictException("Ce numéro de téléphone est déjà utilisé par un vendeur.");
+    
     // appliquer modifications
     await this.prismaService.manager.update({
       where: {
@@ -188,5 +188,26 @@ export class ManagerService {
       },
     });
     return { data: 'Manager mis à jour !' };
+  }
+
+  // supprimer plusieurs managers
+  async deleteMany(ids: string[]) {
+    // verifier que ids est fourni
+    if (ids == undefined)
+      throw new NotFoundException("Vous devez fournir une liste d'ids de managers.");
+    // verifier que les managers existent
+    for (let id of ids) {
+      const manager = await this.findManager({ id_manager: id });
+      if (!manager) throw new NotFoundException("Le manager avec l'id " + id + " n'existe pas.");
+    }
+    // supprimer les managers dans la base de données
+    await this.prismaService.manager.deleteMany({
+      where: {
+        id_manager: {
+          in: ids,
+        },
+      },
+    });
+    return { data: 'Managers supprimés !' };
   }
 }

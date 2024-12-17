@@ -45,4 +45,10 @@ export class GameController {
     delete(@Param('id_game', ParseIntPipe) id_game: number) {
         return this.gameService.delete(id_game);
     }
+
+    @UseGuards(ManagerGuard)
+    @Delete()
+    deleteMany(@Body() ids: number[]) {
+        return this.gameService.deleteMany(ids);
+    }
 }
