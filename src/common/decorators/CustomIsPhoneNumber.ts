@@ -9,7 +9,7 @@ class IsPhoneNumberConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(): string {
-    return 'Le numéro de téléphone doit être un string de 10 chiffres commençant par "06" ou "07".';
+    return 'Le numéro de téléphone doit être une suite de 10 chiffres commençant par un 0.';
   }
 }
 
