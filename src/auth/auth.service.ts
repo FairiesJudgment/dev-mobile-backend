@@ -41,6 +41,11 @@ export class AuthService {
         username : user.username,
         email : user.email,
       }
+      const token = this.jwtService.sign(payload, {
+        expiresIn : this.configService.get('TOKEN_DURATION'),
+        secret : this.configService.get('TOKEN_SECRET'),
+      });
+      return { accesstoken : token, manager : user };
     }
     // si l'utilisateur est un seller
     else {
@@ -49,12 +54,12 @@ export class AuthService {
         username : user.username,
         email : user.email,
       }
+      const token = this.jwtService.sign(payload, {
+        expiresIn : this.configService.get('TOKEN_DURATION'),
+        secret : this.configService.get('TOKEN_SECRET'),
+      });
+      return { accesstoken : token, seller : user };
     }
-    const token = this.jwtService.sign(payload, {
-      expiresIn : this.configService.get('TOKEN_DURATION'),
-      secret : this.configService.get('TOKEN_SECRET'),
-    });
-    return { accesstoken : token };
   }
 
 }
