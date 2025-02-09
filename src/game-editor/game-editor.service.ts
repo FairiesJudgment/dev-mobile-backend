@@ -21,6 +21,16 @@ export class GameEditorService {
         return gameEditor;
     }
 
+    // récupérer un éditeur de jeu selon son nom
+    async getByName(name: string) {
+        // Verifier si name est défini
+        if (!name) { throw new NotFoundException("Vous devez fournir le nom de l'éditeur.");}
+        // Vérifier si l'éditeur existe
+        const gameEditor = await this.prismaService.gameEditor.findUnique({where: { name },});
+        if (!gameEditor) { throw new NotFoundException("Cet éditeur de jeu n'existe pas.");}
+        return gameEditor;
+    }
+
     // créer un éditeur de jeu
     async create(createGameEditorDto: any) {
         const { name, description } = createGameEditorDto;

@@ -22,6 +22,12 @@ export class GameCategoryController {
         return this.gameCategoryService.get(id_category);
     }
 
+    @Public()
+    @Get('name/:name')
+    getByName(@Param('name') name: string) {
+        return this.gameCategoryService.getByName(name);
+    }
+
     @UseGuards(ManagerGuard)
     @Post()
     create(@Body() createGameCategoryDto: CreateGameCategoryDto) {
