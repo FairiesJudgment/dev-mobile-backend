@@ -62,4 +62,17 @@ export class AuthService {
     }
   }
 
+  async verifyRole(email : string) {
+    const manager = await this.managerService.findManager({ email : email });
+    if (manager) {
+      return 'manager';
+    }
+
+    const seller = await this.sellerService.findSeller({ email : email });
+    if (seller) {
+      return 'seller';
+    }
+
+    return null;
+  }
 }

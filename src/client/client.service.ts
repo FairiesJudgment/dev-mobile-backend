@@ -50,6 +50,7 @@ export class ClientService {
             phone,
             address
         } = createClientDto;
+        
         //verifier si l'email existe déjà
         const client = await this.findClient({ email: createClientDto.email });
         if (client) throw new ConflictException("Cet email est déjà utilisé.");

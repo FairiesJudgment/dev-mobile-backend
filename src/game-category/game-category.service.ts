@@ -24,6 +24,17 @@ export class GameCategoryService {
         return gameCategory;
     }
 
+    // récupérer une catégorie de jeu selon son nom
+    async getByName(name: string) {
+        // Verifier si name est défini
+        if (!name) { throw new NotFoundException("Vous devez fournir le nom de la catégorie.");}
+        // Vérifier si la catégorie existe
+        const gameCategory = await this.prismaService.gameCategory.findUnique({where: { name },});
+        if (!gameCategory) { throw new NotFoundException("Cette catégorie de jeu n'existe pas.");}
+        // Retourner les infos de la catégorie
+        return gameCategory;
+    }
+
     // créer une catégorie de jeu
     async create(createGameCategoryDto: CreateGameCategoryDto) {
         const { name, description } = createGameCategoryDto;

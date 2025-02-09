@@ -22,6 +22,12 @@ export class GameEditorController {
         return this.gameEditorService.get(id_editor);
     }
 
+    @Public()
+    @Get('name/:name')
+    getByName(@Param('name') name: string) {
+        return this.gameEditorService.getByName(name);
+    }
+
     @UseGuards(ManagerGuard)
     @Post()
     create(@Body() createGameEditorDto: CreateGameEditorDto) {

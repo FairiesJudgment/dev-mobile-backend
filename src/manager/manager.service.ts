@@ -89,6 +89,10 @@ export class ManagerService {
       is_admin,
     } = createManagerDto;
 
+    // verifier si le mot de passe fait au moins 6 caractères
+    if (password.length < 6)
+      throw new ConflictException('Le mot de passe doit faire au moins 6 caractères.');
+
     // verifier si l'email n'est pas déjà utilisé
     if (email) {
       const manager = await this.findManager({ email: email });

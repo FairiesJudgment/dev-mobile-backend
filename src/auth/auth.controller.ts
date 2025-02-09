@@ -1,4 +1,4 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -20,5 +20,11 @@ export class AuthController {
     @Post('logout')
     async logout(@Request() req) {
         return req.logout();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('verify-role')
+    async verifyRole(@Body('email') email : string) {
+        return this.authService.verifyRole(email);
     }
 }
