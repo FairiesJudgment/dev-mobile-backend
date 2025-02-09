@@ -63,6 +63,10 @@ export class SellerService {
         const { username, email, password, firstname, lastname, phone, address } =
         createSellerDto;
 
+        // verifier si le mot de passe fait au moins 6 caractères
+        if (password.length < 6)
+            throw new ConflictException("Le mot de passe doit faire au moins 6 caractères.");
+
         // verifier si l'email n'est pas déjà utilisé
         if (email) {
             const seller = await this.findSeller({ email: email });
