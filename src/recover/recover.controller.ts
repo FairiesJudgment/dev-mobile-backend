@@ -5,6 +5,7 @@ import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { CreateRecoverDto } from './dto/createRecoverDto';
 import { SessionGuard } from 'src/common/guards/session.guard';
 import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('recovers')
 export class RecoverController {
@@ -22,7 +23,7 @@ export class RecoverController {
         return this.recoverService.getById(id_recover);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('/seller/:id_seller')
     getBySeller(@Param('id_seller') id_seller : string) {
         return this.recoverService.getBySeller(id_seller);

@@ -5,6 +5,7 @@ import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { UpdateDepositedGameDto } from './dto/updateDepositedGameDto';
 import { CreateManyDepositedGameDto } from './dto/createManyDepositedGameDto';
 import { SessionGuard } from 'src/common/guards/session.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('deposited-game')
 export class DepositedGameController {
@@ -35,7 +36,7 @@ export class DepositedGameController {
         return this.depositedGameService.getBySession(id_session);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('/seller/:id_seller')
     getBySeller(@Param('id_seller') id_seller: string) {
         return this.depositedGameService.getBySeller(id_seller);
