@@ -5,6 +5,7 @@ import { UpdateSessionDto } from './dto/updateSessionDto';
 
 @Injectable()
 export class SessionService {
+    
     constructor(private readonly prismaService : PrismaService) {}
 
     async findSession(options : { id_session?: number, name?: string }) {
@@ -46,6 +47,21 @@ export class SessionService {
             },
         });
         if (!session) throw new NotFoundException("Aucune session ouverte actuellement.");
+
+        return session;
+    }
+
+    async getLast() {
+        const now = new Date();
+        const session = await this.prismaService.session.findFirst({
+            where: {
+                date_end: { lt: now },
+            },
+            orderBy: {
+                date_end: 'desc',
+            },
+        });
+        if (!session) throw new NotFoundException("Aucune session n'a été fermée.");
 
         return session;
     }

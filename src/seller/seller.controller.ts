@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Get, Param, Req, Put, Delete, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Get, Param, Req, Put, Delete, Body, Patch } from '@nestjs/common';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { CreateSellerDto } from './dto/createSellerDto';
 import { SellerService } from './seller.service';
@@ -7,6 +7,8 @@ import { Request } from 'express';
 import { UpdateSellerDto } from './dto/updateSellerDto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UpdatePasswordDto } from 'src/manager/dto/updatePasswordDto';
 
 @Controller('sellers')
 export class SellerController {
@@ -41,7 +43,7 @@ export class SellerController {
         return this.sellerService.create(createSellerDto);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(JwtAuthGuard)
     @Put('/update/:id')
     update(@Param('id') id_seller : string, @Body() updateSellerDto : UpdateSellerDto, @Req() request : Request) {
         const asker_id = request.user['id_manager'] ? request.user['id_manager'] : request.user['id_seller'];
@@ -60,10 +62,17 @@ export class SellerController {
         return this.sellerService.deleteMany(ids);
     }
 
-    @UseGuards()
+    @UseGuards(JwtAuthGuard)
     @Get('/get/current')
     getCurrentUser(@Req() request : Request) {
         const userId = request.user['id_seller'];
         return this.sellerService.getCurrentUser(userId);      
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('/update/password')
+    updatePassword(@Req() request : Request, @Body() updatePasswordDto : UpdatePasswordDto) {
+        const userId = request.user['id_seller'];
+        return this.sellerService.updatePassword(updatePasswordDto, userId);
     }
 }

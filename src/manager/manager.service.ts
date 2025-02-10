@@ -9,9 +9,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { uuid } from 'uuidv4';
 import { UpdateManagerDto } from './dto/updateManagerDto';
+import { UpdatePasswordDto } from './dto/updatePasswordDto';
 
 @Injectable()
 export class ManagerService {
+  
   constructor(private readonly prismaService: PrismaService) {}
 
   // trouver un manager selon son email, son id ou son pseudo
@@ -199,6 +201,32 @@ export class ManagerService {
       },
     });
     return { data: 'Manager mis à jour !' };
+  }
+
+  async updatePassword(userId: string, updatePasswordDto: UpdatePasswordDto) {
+    // verifier que l'ancien mot de passe est correct
+    const {oldPassword, newPassword} = updatePasswordDto;
+    const manager = await this.findManager({ id_manager: userId });
+    if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    if (!(await this.validatePassword(oldPassword, manager.password_salt, manager.password)))
+      throw new UnauthorizedException("Mot de passe incorrect.");
+    // verifier que le nouveau mot de passe fait au moins 4 caractères
+    if (newPassword.length < 4)
+      throw new ConflictException('Le mot de passe doit faire au moins 4 caractères.');
+    // hasher le nouveau mot de passe
+    const salt = uuid();
+    const hash = await bcrypt.hash(newPassword + salt, 10);
+    // mettre à jour le mot de passe
+    await this.prismaService.manager.update({
+      where: {
+        id_manager: userId,
+      },
+      data: {
+        password: hash,
+        password_salt: salt,
+      },
+    });
+    return { data: 'Mot de passe mis à jour !' };
   }
 
   // supprimer plusieurs managers
