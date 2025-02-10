@@ -145,11 +145,32 @@ export class SaleService {
     }
 
     async create(createSaleDto: CreateSaleDto, id_manager: any) {
-        const {date, amount, comission, payment_method, id_seller, id_client, id_session, games_sold } = createSaleDto;
+        const {date, comission, payment_method, id_seller, id_client, id_session, games_sold } = createSaleDto;
+        console.log("idclient", id_client);
+        let amount = 0;
+        for (const game of games_sold) {
+            const depositedGames = await this.prismaService.depositedGame.findMany({
+                where: {
+                    id_game: game.id_game,
+                    for_sale: true,
+                },
+                take: game.quantity,
+            });
+
+            if (depositedGames.length < game.quantity) {
+                throw new Error(`Pas assez de jeux déposés pour l'ID de jeu ${game.id_game}`);
+            }
+            depositedGames.map((game) => {
+                amount += Number(game.price);
+            })
+            game.tags = depositedGames.map(depositedGame => depositedGame.tag);
+        }
+
+        
         const sale = await this.prismaService.saleTransaction.create({
             data : {
                 date,
-                amount,
+                amount : amount,
                 comission,
                 payment_method,
                 id_seller,

@@ -4,7 +4,7 @@ import { PaymentMethod } from '@prisma/client'
 
 type GameSold = {
     id_game : number;
-    tags : string[];
+    tags?: string[];
     quantity : number;
 }
 export class CreateSaleDto {
@@ -12,6 +12,7 @@ export class CreateSaleDto {
     @IsDate()
     @Type(() => Date)
     readonly date : Date;
+    @IsOptional()
     @IsNotEmpty()
     amount : number;
     @IsNotEmpty()
