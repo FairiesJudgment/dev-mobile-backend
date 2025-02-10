@@ -4,7 +4,7 @@ import { PaymentMethod } from '@prisma/client'
 
 type GameSold = {
     id_game : number;
-    tags : string[];
+    tags?: string[];
     quantity : number;
 }
 export class CreateSaleDto {

@@ -159,6 +159,22 @@ export class SaleService {
             },
         });
 
+        for (const game of games_sold) {
+            const depositedGames = await this.prismaService.depositedGame.findMany({
+                where: {
+                    id_game: game.id_game,
+                    for_sale: true,
+                },
+                take: game.quantity,
+            });
+
+            if (depositedGames.length < game.quantity) {
+                throw new Error(`Pas assez de jeux déposés pour l'ID de jeu ${game.id_game}`);
+            }
+
+            game.tags = depositedGames.map(depositedGame => depositedGame.tag);
+        }
+
         const createPromises = games_sold.map(async (game) => {
             // creer la relation
             await this.prismaService.gameInSaleTransaction.create({
