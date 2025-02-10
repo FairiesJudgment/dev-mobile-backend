@@ -118,6 +118,7 @@ export class RecoverService {
     async create(id_manager: string, createRecoverDto: CreateRecoverDto) {
         const {amount, id_seller, id_session, games_recovered} = createRecoverDto;
 
+        console.log(createRecoverDto);
         const recover = await this.prismaService.recoverTransaction.create({
             data : {
                 amount,
