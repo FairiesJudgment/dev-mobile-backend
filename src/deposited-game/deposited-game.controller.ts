@@ -29,7 +29,7 @@ export class DepositedGameController {
         return this.depositedGameService.getByGame(id_game);
     }
 
-    @UseGuards(ManagerGuard)
+    @Public()
     @Get('/session/:id_session')
     getBySession(@Param('id_session') id_session: number) {
         return this.depositedGameService.getBySession(id_session);

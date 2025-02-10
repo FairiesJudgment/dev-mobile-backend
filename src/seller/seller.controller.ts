@@ -22,6 +22,12 @@ export class SellerController {
     }
 
     @Public()
+    @Get('/id/:id_seller')
+    getById(@Param('id_seller') id_seller : string) {
+        return this.sellerService.getById(id_seller);
+    }
+
+    @Public()
     @Get('/:username')
     get(@Param('username') username : string, @Req() request : Request) {
         const authHeaders = request.headers.authorization;

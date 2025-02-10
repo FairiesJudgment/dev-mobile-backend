@@ -37,6 +37,13 @@ export class SellerService {
         return await this.prismaService.seller.findMany();
     }
 
+    // récupérer un vendeur selon son id
+    async getById(id_seller: string) {
+        const seller = await this.findSeller({id_seller : id_seller});
+        if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
+        return seller;
+    }
+
     // récupérer un vendeur selon son username
     async get(username: string, asker_id: string) {
         const seller = await this.findSeller({username : username});
