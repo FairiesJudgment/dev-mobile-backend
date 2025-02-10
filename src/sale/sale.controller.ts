@@ -4,6 +4,7 @@ import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { CreateSaleDto } from './dto/createSaleDto';
 import { Request } from 'express';
 import { UpdateSaleDto } from './dto/updateSaleDto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('sales')
 export class SaleController {
@@ -21,7 +22,7 @@ export class SaleController {
         return this.saleService.getById(id_sale);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('/seller/:id_seller')
     getBySeller(@Param('id_seller') id_seller : string) {
         return this.saleService.getBySeller(id_seller);

@@ -69,6 +69,13 @@ export class ManagerService {
     };
   }
 
+  async getCurrentUser(id_manager: string) {
+    // vérifier si le manager existe
+    const manager = await this.findManager({ id_manager: id_manager });
+    if (!manager) throw new NotFoundException("Ce manager n'existe pas.");
+    return manager;
+  }
+
   // enregistrer un manager en BD
   async create(createManagerDto: CreateManagerDto) {
     const {

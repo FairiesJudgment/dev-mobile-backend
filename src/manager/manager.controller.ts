@@ -60,4 +60,11 @@ export class ManagerController {
     deleteMany(@Body() ids: string[]) {
         return this.managerService.deleteMany(ids);
     }
+
+    @UseGuards(ManagerGuard)
+    @Get('/get/current')
+    getCurrentUser(@Req() request : Request) {
+        const userId = request.user['id_manager'];
+        return this.managerService.getCurrentUser(userId);      
+    }
 }

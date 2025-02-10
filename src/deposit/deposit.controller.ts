@@ -5,6 +5,7 @@ import { SessionGuard } from 'src/common/guards/session.guard';
 import { Request } from 'express';
 import { CreateDepositDto } from './dto/createDepositDto';
 import { UpdateDepositDto } from './dto/updateDepositDto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('deposits')
 export class DepositController {
@@ -22,7 +23,7 @@ export class DepositController {
         return this.depositService.getById(id_deposit);
     }
 
-    @UseGuards(ManagerGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('/seller/:id_seller')
     getBySeller(@Param('id_seller') id_seller : string) {
         return this.depositService.getBySeller(id_seller);

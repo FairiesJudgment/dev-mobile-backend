@@ -193,4 +193,11 @@ export class SellerService {
         });
         return { data : 'Vendeurs supprimés !' };
     }
+
+    async getCurrentUser(id_seller: string) {
+        // vérifier si le vendeur existe
+        const seller = await this.findSeller({ id_seller: id_seller });
+        if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
+        return seller;
+      }
 }

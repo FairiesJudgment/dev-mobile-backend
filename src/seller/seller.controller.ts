@@ -64,5 +64,12 @@ export class SellerController {
     @Delete()
     deleteMany(@Body() ids: string[]) {
         return this.sellerService.deleteMany(ids);
-  }
+    }
+
+    @UseGuards()
+    @Get('/get/current')
+    getCurrentUser(@Req() request : Request) {
+        const userId = request.user['id_seller'];
+        return this.sellerService.getCurrentUser(userId);      
+    }
 }
