@@ -12,6 +12,7 @@ export class CreateSaleDto {
     @IsDate()
     @Type(() => Date)
     readonly date : Date;
+    @IsOptional()
     @IsNotEmpty()
     amount : number;
     @IsNotEmpty()
