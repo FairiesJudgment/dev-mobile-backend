@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npm install -g @nestjs/cli && npx prisma generate && npx prisma migrate dev --schema=./prisma/schema.prisma && npx ts-node ./prisma/seed.ts && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node dist/main.js",
+    "start": "node dist/src/main.js",
     "start:dev": "npx nest start --watch",
     "start:debug": "npx nest start --debug --watch",
     "start:prod": "node dist/main",
