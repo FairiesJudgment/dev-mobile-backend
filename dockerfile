@@ -2,8 +2,9 @@ FROM node:22
 
 WORKDIR /awi-backend
 
-COPY package*.json ./
+RUN npm install -g @nestjs/cli
 
+COPY package*.json ./
 
 RUN npm install
 
