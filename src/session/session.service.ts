@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateSessionDto } from './dto/createSessionDto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateSessionDto } from './dto/updateSessionDto';
+import { error } from 'console';
 
 @Injectable()
 export class SessionService {
@@ -75,9 +76,15 @@ export class SessionService {
         // vérifier que nouvelle session ne se chevauche pas une autre
         if (this.isConflict(sessions, date_begin, date_end)) throw new ConflictException("Il ne peut y avoir qu'une seule session ouverte à la fois.");
 
+        console.log(createSessionDto);
         await this.prismaService.session.create({
             data : {
-                ...createSessionDto,
+                name: createSessionDto.name,
+                date_begin: createSessionDto.date_begin,
+                date_end: createSessionDto.date_end,
+                deposit_fees: createSessionDto.deposit_fees,
+                discount: createSessionDto.discount,
+                comission_fees: createSessionDto.comission_fees,
             },
         });
 
