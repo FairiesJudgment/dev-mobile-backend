@@ -146,6 +146,7 @@ export class SaleService {
 
     async create(createSaleDto: CreateSaleDto, id_manager: any) {
         const {date, comission, payment_method, id_seller, id_client, id_session, games_sold } = createSaleDto;
+        console.log("idclient", id_client);
         let amount = 0;
         for (const game of games_sold) {
             const depositedGames = await this.prismaService.depositedGame.findMany({
