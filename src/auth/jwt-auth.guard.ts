@@ -7,8 +7,8 @@ import { IS_PUBLIC_KEY } from 'src/common/decorators/PublicDecorator';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
     constructor(private reflector: Reflector) {
-        super();
-      }
+      super();
+    }
     
       canActivate(context: ExecutionContext) {
         const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [

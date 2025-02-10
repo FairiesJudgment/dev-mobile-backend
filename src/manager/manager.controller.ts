@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards, Delete, Put, Req, Get } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards, Delete, Put, Req, Get, Patch } from '@nestjs/common';
 import { ManagerService } from './manager.service';
 import { CreateManagerDto } from './dto/createManagerDto';
 import { AdminGuard } from 'src/common/guards/admin.guard';
@@ -8,6 +8,7 @@ import { Public } from 'src/common/decorators/PublicDecorator';
 import { ManagerGuard } from 'src/common/guards/manager.guard';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UpdatePasswordDto } from './dto/updatePasswordDto';
 
 @Controller('managers')
 export class ManagerController {
@@ -66,5 +67,12 @@ export class ManagerController {
     getCurrentUser(@Req() request : Request) {
         const userId = request.user['id_manager'];
         return this.managerService.getCurrentUser(userId);      
+    }
+
+    @UseGuards(ManagerGuard)
+    @Patch('/update/password')
+    updatePassword(@Req() request : Request, @Body() updatePasswordDto : UpdatePasswordDto) {
+        const userId = request.user['id_manager'];
+        return this.managerService.updatePassword(userId, updatePasswordDto);
     }
 }

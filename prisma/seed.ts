@@ -6,6 +6,7 @@ import { uuid } from 'uuidv4';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.manager.deleteMany();
   const saltRounds = 10;
   const salt = uuid();
   const password = '123456789';

@@ -4,6 +4,7 @@ import { AdminGuard } from 'src/common/guards/admin.guard';
 import { CreateSessionDto } from './dto/createSessionDto';
 import { UpdateSessionDto } from './dto/updateSessionDto';
 import { Public } from 'src/common/decorators/PublicDecorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('sessions')
 export class SessionController {
@@ -19,6 +20,12 @@ export class SessionController {
     @Get('/opened')
     getOpened() {
         return this.sessionService.getOpened();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/last')
+    getLast() {
+        return this.sessionService.getLast();
     }
 
     @Public()

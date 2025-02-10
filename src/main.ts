@@ -12,11 +12,11 @@ async function bootstrap() {
     // 2 URL pour localhost et 127.0.0.1 (problème de cors)
     origin: [configService.get('FRONTEND_URL'), configService.get('FRONTEND_URL2')],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  await app.listen(configService.get<number>('PORT') ?? 3000);
+  await app.listen(configService.get<number>('PORT') ?? 5000);
 }
 bootstrap();

@@ -5,6 +5,7 @@ import { CreateSellerDto } from './dto/createSellerDto';
 import { uuid } from 'uuidv4';
 import { ManagerService } from 'src/manager/manager.service';
 import { UpdateSellerDto } from './dto/updateSellerDto';
+import { UpdatePasswordDto } from 'src/manager/dto/updatePasswordDto';
 
 @Injectable()
 export class SellerService {
@@ -199,5 +200,31 @@ export class SellerService {
         const seller = await this.findSeller({ id_seller: id_seller });
         if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
         return seller;
-      }
+    }
+
+    async updatePassword (updatePasswordDto: UpdatePasswordDto, userId: string) {
+        // vérifier que l'ancien mot de passe est correct
+        const { oldPassword, newPassword } = updatePasswordDto;
+        const seller = await this.findSeller({ id_seller: userId });
+        if (!seller) throw new NotFoundException("Ce vendeur n'existe pas.");
+        if (!(await this.validatePassword(oldPassword, seller.password_salt, seller.password)))
+            throw new UnauthorizedException("Mot de passe incorrect.");
+        // vérifier que le nouveau mot de passe fait au moins 4 caractères
+        if (newPassword.length < 4)
+            throw new ConflictException('Le mot de passe doit faire au moins 4 caractères.');
+        // hasher le nouveau mot de passe
+        const salt = uuid();
+        const hash = await bcrypt.hash(newPassword + salt, 10);
+        // mettre à jour le mot de passe
+        await this.prismaService.seller.update({
+            where: {
+                id_seller: userId,
+            },
+            data: {
+                password: hash,
+                password_salt: salt,
+            },
+        });
+        return { data: 'Mot de passe mis à jour !' };
+    }
 }
