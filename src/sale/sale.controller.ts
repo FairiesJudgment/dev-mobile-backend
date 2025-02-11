@@ -29,19 +29,19 @@ export class SaleController {
     }
 
     @UseGuards(ManagerGuard)
-    @Get('session/:id_session')
+    @Get('/session/:id_session')
     getBySession(@Param('id_session', ParseIntPipe) id_session : number) {
         return this.saleService.getBySession(id_session)
     }
 
     @UseGuards(ManagerGuard)
-    @Get('client/:id_client')
+    @Get('/client/:id_client')
     getByClient(@Param('id_client', ParseIntPipe) id_client : number) {
         return this.saleService.geyByClient(id_client);
     }
 
     @UseGuards(ManagerGuard)
-    @Get('game/:id_game')
+    @Get('/game/:id_game')
     getByGame(@Param('id_game', ParseIntPipe) id_game : number) {
         return this.saleService.getByGame(id_game);
     }

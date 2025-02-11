@@ -33,10 +33,10 @@ export class RecoverService {
 
         const recoversWithGameData = recovers.map(recover => ({
             ...recover,
-            game_data: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
+            games_recovered: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
         }));
     
-        return { data: recoversWithGameData };
+        return recoversWithGameData;
     }
 
     async getBySession(id_session: number) {
@@ -58,10 +58,10 @@ export class RecoverService {
 
         const recoversWithGameData = recovers.map(recover => ({
             ...recover,
-            game_data: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
+            games_recovered: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
         }));
     
-        return { data: recoversWithGameData };
+        return recoversWithGameData;
     }
 
     async getBySeller(id_seller: string) {
@@ -83,10 +83,10 @@ export class RecoverService {
 
         const recoversWithGameData = recovers.map(recover => ({
             ...recover,
-            game_data: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
+            games_recovered: gamesInRecovers.filter(game => game.id_recover === recover.id_recover).map(({ id_recover, ...gameData }) => gameData),
         }));
     
-        return { data: recoversWithGameData };
+        return recoversWithGameData;
     }
 
     async getById(id_recover: string) {
@@ -103,10 +103,10 @@ export class RecoverService {
 
         const recoverWithGameData = {
             ...recover,
-            game_data: gamesInRecover.map(({ id_recover, ...gameData }) => gameData),
+            games_recovered: gamesInRecover.map(({ id_recover, ...gameData }) => gameData),
         };
     
-        return { data: recoverWithGameData };
+        return recoverWithGameData;
     }
 
     async getAll() {

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/createSaleDto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateSaleDto } from './dto/updateSaleDto';
@@ -33,10 +33,10 @@ export class SaleService {
 
         const salesWithGameData = sales.map(sale => ({
             ...sale,
-            game_data: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
+            games_sold: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
         }));
     
-        return { data: salesWithGameData };
+        return salesWithGameData;
     }
 
     async geyByClient(id_client: number) {
@@ -58,10 +58,10 @@ export class SaleService {
 
         const salesWithGameData = sales.map(sale => ({
             ...sale,
-            game_data: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
+            games_sold: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
         }));
     
-        return { data: salesWithGameData };
+        return salesWithGameData;
     }
 
     async getBySession(id_session: number) {
@@ -83,10 +83,10 @@ export class SaleService {
 
         const salesWithGameData = sales.map(sale => ({
             ...sale,
-            game_data: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
+            games_sold: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
         }));
     
-        return { data: salesWithGameData };
+        return salesWithGameData;
     }
 
     async getBySeller(id_seller: string) {
@@ -108,10 +108,10 @@ export class SaleService {
 
         const salesWithGameData = sales.map(sale => ({
             ...sale,
-            game_data: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
+            games_sold: gamesInSales.filter(game => game.id_sale === sale.id_sale).map(({ id_sale, ...gameData }) => gameData),
         }));
     
-        return { data: salesWithGameData };
+        return salesWithGameData;
     }
 
     async getById(id_sale: string) {
@@ -132,10 +132,10 @@ export class SaleService {
 
         const saleWithGameData = {
             ...sale,
-            game_data: gamesInSale.map(({ id_sale, ...gameData }) => gameData),
+            games_sold: gamesInSale.map(({ id_sale, ...gameData }) => gameData),
         };
     
-        return { data: saleWithGameData };
+        return saleWithGameData;
     }
 
     async getAll() {
@@ -152,13 +152,14 @@ export class SaleService {
             const depositedGames = await this.prismaService.depositedGame.findMany({
                 where: {
                     id_game: game.id_game,
+                    id_seller : id_seller,
                     for_sale: true,
                 },
                 take: game.quantity,
             });
 
             if (depositedGames.length < game.quantity) {
-                throw new Error(`Pas assez de jeux déposés pour l'ID de jeu ${game.id_game}`);
+                throw new UnauthorizedException(`Pas assez de jeux déposés pour l'ID de jeu ${game.id_game}`);
             }
             depositedGames.map((game) => {
                 amount += Number(game.price);

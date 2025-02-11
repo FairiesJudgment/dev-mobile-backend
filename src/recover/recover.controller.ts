@@ -30,13 +30,13 @@ export class RecoverController {
     }
 
     @UseGuards(ManagerGuard)
-    @Get('session/:id_session')
+    @Get('/session/:id_session')
     getBySession(@Param('id_session', ParseIntPipe) id_session : number) {
         return this.recoverService.getBySession(id_session)
     }
 
     @UseGuards(ManagerGuard)
-    @Get('game/:id_game')
+    @Get('/game/:id_game')
     getByGame(@Param('id_game', ParseIntPipe) id_game : number) {
         return this.recoverService.getByGame(id_game);
     }

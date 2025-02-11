@@ -27,10 +27,10 @@ export class DepositService {
 
         const depositsWithGameData = deposits.map(deposit => ({
             ...deposit,
-            game_data: gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit).map(({ id_deposit, ...gameData }) => gameData),
+            games_deposited: gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit).map(({ id_deposit, ...gameData }) => gameData),
         }));
     
-        return { data: depositsWithGameData };
+        return depositsWithGameData;
     }
 
     async getBySession(id_session: number) {
@@ -50,12 +50,15 @@ export class DepositService {
             },
         });
 
-        const depositsWithGameData = deposits.map(deposit => ({
+        const depositsWithGameData = deposits.map(deposit => {
+            const games_deposited = gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit);
+            return {
             ...deposit,
-            game_data: gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit).map(({ id_deposit, ...gameData }) => gameData),
-        }));
+            games_deposited
+            };
+        });
     
-        return { data: depositsWithGameData };
+        return depositsWithGameData;
     }
 
     async getBySeller(id_seller: string) {
@@ -77,10 +80,10 @@ export class DepositService {
 
         const depositsWithGameData = deposits.map(deposit => ({
             ...deposit,
-            game_data: gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit).map(({ id_deposit, ...gameData }) => gameData),
+            games_deposited: gamesInDeposits.filter(game => game.id_deposit === deposit.id_deposit).map(({ id_deposit, ...gameData }) => gameData),
         }));
     
-        return { data: depositsWithGameData };
+        return depositsWithGameData;
     }
 
     async getById(id_deposit: string) {
@@ -101,10 +104,10 @@ export class DepositService {
 
         const depositWithGameData = {
             ...deposit,
-            game_data: gamesInDeposit.map(({ id_deposit, ...gameData }) => gameData),
+            games_deposited: gamesInDeposit.map(({ id_deposit, ...gameData }) => gameData),
         };
     
-        return { data: depositWithGameData };
+        return depositWithGameData;
     }
 
     async getAll() {

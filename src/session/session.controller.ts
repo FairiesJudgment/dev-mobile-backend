@@ -41,7 +41,7 @@ export class SessionController {
     }
 
     @UseGuards(AdminGuard)
-    @Put('update/:id')
+    @Put('/update/:id')
     update(@Param('id', ParseIntPipe) id_session : number, @Body() updateSessionDto : UpdateSessionDto) {
         return this.sessionService.update(updateSessionDto, id_session);
     }
