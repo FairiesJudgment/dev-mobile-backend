@@ -14,14 +14,14 @@ async function main() {
 
   const manager = await prisma.manager.create({
     data: {
-      username: 'Alex',
+      username: 'Golden',
       password: hashedPassword,
       password_salt: salt,
-      firstname: 'Alexandre',
-      lastname: 'Fleury',
-      email: 'alexx97354@gmail.com',
-      phone: '0785698002',
-      address: '45 rue Esculape',
+      firstname: 'Gol',
+      lastname: 'DEN',
+      email: 'golden@gmail.com',
+      phone: '0660266332',
+      address: 'Polytech askip',
       is_admin: true,
     },
   });
