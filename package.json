@@ -6,9 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "npm install -g @nestjs/cli && npx prisma generate && npx prisma migrate deploy --schema=./prisma/schema.prisma && nest build",
+    "build": "npm install -g @nestjs/cli && npx prisma generate && npx prisma migrate deploy --schema=./prisma/schema.prisma && tsc prisma/seed.ts && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts",
+    "seed": "node prisma/seed.js",
     "start": "node dist/src/main.js",
     "start:dev": "npx nest start --watch",
     "start:debug": "npx nest start --debug --watch",
