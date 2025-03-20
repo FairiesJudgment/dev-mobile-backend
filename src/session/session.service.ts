@@ -132,14 +132,6 @@ export class SessionService {
         // vérifier que nouvelle session ne se chevauche pas une autre
         if (this.isConflict(sessions, newDateBegin, newDateEnd)) throw new ConflictException("Il ne peut y avoir qu'une seule session ouverte à la fois.");
 
-        // verifier qu'un name n'est pas déjà utilisé
-        const sessionName = await this.prismaService.session.findFirst({
-            where: {
-                name : updateSessionDto.name,
-            },
-        });
-        if (sessionName) throw new ConflictException("Ce nom de session est déjà utilisé.");
-
         await this.prismaService.session.update({
             where: {
                 id_session,
