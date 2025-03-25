@@ -162,7 +162,6 @@ export class DepositedGameService {
     // - le jeu déposé existe
     // - le jeu n'est pas vendu
     async update(tag: string, updateDepositedGameDto: UpdateDepositedGameDto) {
-
         const {
             price,
             sold,
@@ -171,45 +170,54 @@ export class DepositedGameService {
             id_session,
             id_seller,
         } = updateDepositedGameDto;
-
+    
         // Vérifier si le jeu déposé existe
         const depositedGame = await this.prismaService.depositedGame.findUnique({where: { tag },});
-        if (!depositedGame) { throw new NotFoundException("Ce jeu déposé n'existe pas.");}
-
+        if (!depositedGame) { 
+            throw new NotFoundException("Ce jeu déposé n'existe pas.");
+        }
+    
         // Vérifier si le jeu existe
         if (id_game) {
             const game = await this.prismaService.game.findUnique({where: { id_game },});
-            if (!game) { throw new NotFoundException("Ce jeu n'existe pas.");}
+            if (!game) { 
+                throw new NotFoundException("Ce jeu n'existe pas.");
+            }
         }
-
+    
         // Vérifier si la session existe
         if (id_session) {
             const session = await this.prismaService.session.findUnique({where: { id_session },});
-            if (!session) { throw new NotFoundException("Cette session n'existe pas.");}
+            if (!session) { 
+                throw new NotFoundException("Cette session n'existe pas.");
+            }
         }
-
+    
         // Vérifier si le vendeur existe
         if (id_seller) {
-        const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
-        if (!seller) { throw new NotFoundException("Ce vendeur n'existe pas.");}
-        }
-
-        // mettre à jour le jeu déposé en BD
-        // si il y a plusieurs jeux déposés avec le meme id_game, id_session et id_seller:
-        // - on les met tous à jour
-        await this.prismaService.depositedGame.updateMany({
-            where: { id_game, id_seller, id_session, sold: false },
-            data: {
-                price,
-                sold,
-                for_sale,
-                id_game,
-                id_session,
-                id_seller
+            const seller = await this.prismaService.seller.findUnique({where: { id_seller },});
+            if (!seller) { 
+                throw new NotFoundException("Ce vendeur n'existe pas.");
             }
+        }
+    
+        // Construire l'objet de mise à jour dynamiquement
+        const updateData: any = {};
+        if (price !== undefined) updateData.price = price;
+        if (sold !== undefined) updateData.sold = sold;
+        if (for_sale !== undefined) updateData.for_sale = for_sale;
+        if (id_game !== undefined) updateData.id_game = id_game;
+        if (id_session !== undefined) updateData.id_session = id_session;
+        if (id_seller !== undefined) updateData.id_seller = id_seller;
+    
+        // mettre à jour uniquement le jeu déposé avec le tag spécifique
+        await this.prismaService.depositedGame.update({
+            where: { tag },
+            data: updateData
         });
+    
         // retourner message de succès
-        return { data: 'Jeux déposés mis à jour avec succès !' };
+        return { data: 'Jeu déposé mis à jour avec succès !' };
     }
 
     // supprimer un jeu déposé
